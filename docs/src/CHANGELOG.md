@@ -4,6 +4,25 @@ All notable changes to the JivikaHunt project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-11-12
+
+### Added
+
+- **Phase 4 Core Public Portal & Browsing Experience**:
+  - Global brand layout with wordmark `JivikaHunt` (`components/Header.jsx`), desktop navigation, search bar, and mobile responsive drawer.
+  - Comprehensive four-column footer (`components/Footer.jsx`) with category links, policy pages, official community channels, and recruitment disclaimer notices sourced solely from `lib/siteConfig.js`.
+  - Reusable `components/JobCard.jsx` displaying company logo/initials avatar, job title, company name, location, chips (type, work mode, batch, salary), and IST application deadlines.
+  - Interactive URL-synchronized filter toolbar (`components/JobFilters.jsx`) supporting `type`, `workMode`, `batch`, `location`, `skills`, and `q` keywords with shareable and crawlable URLs.
+  - Accessible server-rendered pagination component (`components/Pagination.jsx`) preserving active filter queries.
+  - Google AdSense wrapper component (`components/AdSlot.jsx`) with fixed minimum height (`min-h-[280px]`) preventing layout shift (CLS), placed after every 5th card (max 3/page).
+  - Pure HTML/JS share widget (`components/ShareButtons.jsx`) for WhatsApp, Telegram, X, Facebook, Copy Link, and native mobile Web Share without third-party tracking scripts.
+  - Contributor author box (`components/AuthorBox.jsx`) with dashed border, avatar, display name, bio, and shared team contact email (strictly concealing contributor personal email).
+  - Server-rendered Home Page (`/`) and Browse Page (`/jobs`) displaying 20 positions per page and dynamically excluding expired listings.
+  - Job Detail Page (`/jobs/[slug]`) adhering strictly to the AGENTS.md ordering requirement; expired jobs render a notice banner and `noindex` robots meta tag while retaining related job recommendations.
+  - Related opportunities engine (`getRelatedJobs`) recommending up to 4 active positions by matching skills, job type, or locations.
+  - Safe Markdown engine (`lib/markdown.js`) powered by `marked` and `sanitize-html` serving static informational pages from `/content` (`/about`, `/contact`, `/disclaimer`, `/privacy`).
+  - Unit and API test suite expanded to 120 tests across 18 files.
+
 ## [0.4.0] - 2026-11-12
 
 ### Added

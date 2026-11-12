@@ -19,7 +19,16 @@ JivikaHunt is a fast, clean, and trustworthy job board designed specifically for
 | **Contributor**    | Trusted team members (5-6 people)  | Create, edit, and delete their own job posts through the `/admin` area (capped at 30 new jobs/day).         |
 | **Admin**          | Site owner / founder               | Manage all jobs, create and invite contributors, review broken link reports, and enforce security policies. |
 
-## 4. Glossary of Terms
+## 4. Public Browsing Architecture
+
+The public experience prioritizes accessibility, crawlability, and zero friction:
+
+- **Server-Rendered Lists**: Default `/` and `/jobs` views render 20 jobs per page using URL query parameters (`type`, `workMode`, `batch`, `location`, `skills`, `q`) for shareable, bookmarkable links.
+- **Strict Detail Ordering**: The job detail page (`/jobs/[slug]`) follows a rigorous layout hierarchy: Header with badges -> "Posted by {name}, JivikaHunt Team" with IST dates -> Ad slot -> Company overview -> Summary -> Skills -> Responsibilities -> Eligibility -> Official Apply button -> Report broken link -> Related jobs (max 4) -> Share buttons -> Author box.
+- **Contributor Privacy**: Contributor personal email addresses are never published or returned via public APIs. Author boxes display display names, bios, avatars, and the team contact email from `siteConfig.contactEmail`.
+- **IST Expiry**: Application deadlines strictly expire at 23:59:59.999 IST of the specified `lastDate`. Expired jobs are omitted from public lists and sitemaps, but their detail page remains accessible with an "Expired" notice banner, `noindex` meta tag, and related job recommendations.
+
+## 5. Glossary of Terms
 
 - **Fresher**: A recent college graduate seeking their first full-time role (0-1 years of experience).
 - **Intern**: A current college student or recent graduate working short-term for practical experience.
