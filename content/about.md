@@ -24,9 +24,9 @@ To provide a fast, clean, and 100% verified job discovery platform where fresher
 
 ## Organization Information
 
-- **Founder & Head of Operations**: [TO FILL: Founder Name / Student Founder]
-- **Founding Year**: [TO FILL: e.g., 2026]
-- **Registered Location**: [TO FILL: City, State, India]
+- **Founder & Head of Operations**: Ranjan Kumar Verma
+- **Founding Year**: 2026
+- **Registered Location**: Bangalore, Karnataka, India
 - **Official Inquiries**: contact@jivikahunt.com
 - **Website**: https://jivikahunt.com
 

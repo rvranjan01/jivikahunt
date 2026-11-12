@@ -14,10 +14,41 @@ JivikaHunt stores its application data in MongoDB Atlas using Mongoose ODM. Ever
 | `Image`        | `images`        | WebP binary images stored directly in database to survive dyno restarts. | **Implemented (Phase 2)** |
 | `Job`          | `jobs`          | Full job listings, company profiles, and application links.              | **Implemented (Phase 3)** |
 | `Report`       | `reports`       | Public reports for broken links, expired posts, or scams.                | **Implemented (Phase 5)** |
-| `Guide`        | `guides`        | Career guidance and interview preparation articles.                      | Scheduled (Phase 6)       |
-| `Subscriber`   | `subscribers`   | Double opt-in email alert subscribers.                                   | Scheduled (Phase 6)       |
+| `Guide`        | `guides`        | Career guidance and interview preparation articles.                      | **Implemented (Phase 6)** |
+| `Subscriber`   | `subscribers`   | Double opt-in email alert subscribers.                                   | **Implemented (Phase 6)** |
 
 ## 3. Implemented Schemas
+
+### Guide Schema (`models/Guide.js` — Phase 6)
+
+- `title` (String, required, max 160 chars): Article headline.
+- `slug` (String, required, unique, indexed): URL-friendly unique identifier.
+- `summary` (String, required, min 40, max 300 chars): Meta description and card abstract.
+- `body` (String, required, min 100 chars): Markdown text content. Rendered safely with `marked` and sanitized with `sanitize-html`.
+- `status` (String, enum: `['draft', 'published']`, default: `'draft'`, indexed): Publication state.
+- `readingTime` (Number, default: 1): Computed estimated reading duration in minutes based on word count.
+- `createdBy` (ObjectId, ref: User, required, indexed): Author user reference.
+- `postedByName` (String, required): Preserved contributor displayName.
+- `createdAt` & `updatedAt` (Date, indexed): Timestamps.
+- **Indexes**:
+  - `{ slug: 1 }` (unique)
+  - `{ status: 1, createdAt: -1 }`
+
+### Subscriber Schema (`models/Subscriber.js` — Phase 6)
+
+- `email` (String, required, unique, lowercase, indexed): Subscriber's email address.
+- `preferences` (Subdocument):
+  - `types` (Array of Strings): Filter preferences (`['fresher', 'intern', 'experienced']`).
+  - `batches` (Array of Numbers): Graduation year preferences.
+- `confirmToken` (String, default: null, indexed): Cryptographic hex token for double opt-in verification.
+- `confirmedAt` (Date, default: null, indexed): Timestamp when subscription was confirmed.
+- `unsubscribeToken` (String, required, unique, indexed): Cryptographic token for one-click unsubscribe links.
+- `lastDigestSentAt` (Date, default: null): Timestamp of latest daily digest dispatch.
+- `createdAt` (Date, default: Date.now): Sign-up timestamp.
+- **Indexes**:
+  - `{ email: 1 }` (unique)
+  - `{ unsubscribeToken: 1 }` (unique)
+  - `{ confirmedAt: 1 }`
 
 ### Job Schema (`models/Job.js` — Phase 3)
 

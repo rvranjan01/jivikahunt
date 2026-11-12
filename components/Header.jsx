@@ -48,6 +48,21 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href="/guides"
+              className="text-sm font-semibold text-slate-700 transition-colors hover:text-blue-600"
+            >
+              Guides
+            </Link>
+            <Link
+              href="/saved"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-700 transition-colors hover:text-blue-600"
+            >
+              <svg className="h-4 w-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              <span>Saved</span>
+            </Link>
           </nav>
         </div>
 
@@ -147,6 +162,20 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href="/guides"
+              onClick={() => setMobileMenuOpen(false)}
+              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600"
+            >
+              Guides
+            </Link>
+            <Link
+              href="/saved"
+              onClick={() => setMobileMenuOpen(false)}
+              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600"
+            >
+              Saved Jobs
+            </Link>
           </nav>
         </div>
       )}

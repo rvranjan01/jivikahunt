@@ -8,8 +8,8 @@ Have a question, feedback, or need assistance regarding a job listing on JivikaH
 
 - **Official Inquiries & Support**: contact@jivikahunt.com
 - **Response Time**: We usually reply within 24 to 48 business hours.
-- **Physical Mailing Address**: [TO FILL: Registered Address, Street, City, State, PIN, India]
-- **Operational Jurisdiction**: [TO FILL: e.g., Bengaluru, Karnataka, India]
+- **Physical Mailing Address**: BTM 2nd Stage Near Geeky Ants, bangalore, Karnataka,India
+- **Operational Jurisdiction**: Bengaluru, Karnataka, India
 
 ---
 

@@ -4,6 +4,7 @@ import JobCard from '@/components/JobCard';
 import JobFilters from '@/components/JobFilters';
 import Pagination from '@/components/Pagination';
 import AdSlot from '@/components/AdSlot';
+import JobAlertsBanner from '@/components/JobAlertsBanner';
 import siteConfig from '@/lib/siteConfig';
 
 export const dynamic = 'force-dynamic';
@@ -121,6 +122,11 @@ export default async function HomePage({ searchParams }) {
           })}
         </div>
       )}
+
+      {/* Email Job Alerts Banner */}
+      <div className="my-10">
+        <JobAlertsBanner />
+      </div>
 
       {/* Pagination */}
       <Pagination

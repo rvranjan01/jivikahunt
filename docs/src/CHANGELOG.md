@@ -4,6 +4,25 @@ All notable changes to the JivikaHunt project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-11-12
+
+### Added
+
+- **Phase 6 Saved Jobs, Email Alerts with Double Opt-In, Scheduled Publishing, RSS 2.0 & Guides**:
+  - Client-side Saved Jobs bookmarking via `localStorage` (`jh_saved_jobs`) with real-time UI synchronization through custom window events (`SaveJobButton.jsx`).
+  - Saved Jobs hub (`/saved`) batch resolving stored IDs (`POST /api/jobs/saved`), filtering out expired or deleted jobs, and supporting one-click "Clear All".
+  - Double Opt-In Email Alerts engine (`models/Subscriber.js`, `/api/alerts/subscribe`, `/api/alerts/confirm`, `/api/alerts/unsubscribe`) with category/batch preferences and RFC-compliant one-click unsubscribe links in every email.
+  - Interactive job alerts banner (`JobAlertsBanner.jsx`) on the public home page with preference modal.
+  - Automated Daily Digest script (`scripts/daily-digest.js`) matching 24h fresh jobs against confirmed subscriber filters.
+  - Automated Scheduled Publishing script (`scripts/publish-scheduled.js`) advancing pending scheduled jobs to published status, recording audit logs, and firing Telegram channel broadcasts.
+  - Valid RSS 2.0 syndication feed (`/feed.xml`) delivering 25 latest non-expired postings with RFC 822 timestamps and HTTP caching headers.
+  - Career Guides Mongoose model (`models/Guide.js`) with computed reading time and unique slug generation.
+  - Contributor and Admin Guides CRUD (`/admin/guides`, `/admin/guides/new`, `/admin/guides/[id]/edit`, `/api/admin/guides/*`) enforcing strict contributor ownership isolation.
+  - Public Guides section (`/guides` directory and `/guides/[slug]` reader) featuring safe sanitized Markdown rendering, `schema.org/Article` structured data, and related guide recommendations.
+  - Documented 5 starter guide outlines in `docs/src/10-contributor-guide.md`.
+  - Contributor Dashboard live metrics update (`/admin`) displaying dynamic counts for published jobs, drafts, total impressions, daily quota remaining, and open reports.
+  - Test suite expanded to 147 tests across 27 test files (100% passing).
+
 ## [0.6.0] - 2026-11-12
 
 ### Added

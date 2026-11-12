@@ -27,6 +27,10 @@ The public experience prioritizes accessibility, crawlability, and zero friction
 - **Strict Detail Ordering**: The job detail page (`/jobs/[slug]`) follows a rigorous layout hierarchy: Header with badges -> "Posted by {name}, JivikaHunt Team" with IST dates -> Ad slot -> Company overview -> Summary -> Skills -> Responsibilities -> Eligibility -> Official Apply button -> Report broken link -> Related jobs (max 4) -> Share buttons -> Author box.
 - **Contributor Privacy**: Contributor personal email addresses are never published or returned via public APIs. Author boxes display display names, bios, avatars, and the team contact email from `siteConfig.contactEmail`.
 - **IST Expiry**: Application deadlines strictly expire at 23:59:59.999 IST of the specified `lastDate`. Expired jobs are omitted from public lists and sitemaps, but their detail page remains accessible with an "Expired" notice banner, `noindex` meta tag, and related job recommendations.
+- **Client-Side Saved Jobs**: Visitors can bookmark jobs with a heart icon saved strictly to `localStorage` (`/saved`), requiring zero logins or accounts.
+- **Email Job Alerts (Double Opt-In)**: Visitors can subscribe with custom job type and batch preferences. Subscription requires email confirmation, and every email includes an RFC-compliant one-click unsubscribe link.
+- **Syndication (RSS 2.0)**: Fresh jobs are broadcast in standard XML at `/feed.xml` for RSS readers and news aggregators.
+- **Career Guides**: Long-form advice and preparation articles at `/guides` and `/guides/[slug]`, authored in Markdown, safely sanitized, and formatted with `Article` structured data.
 
 ## 5. Glossary of Terms
 

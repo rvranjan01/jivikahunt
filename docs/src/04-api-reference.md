@@ -29,7 +29,69 @@ All JivikaHunt backend endpoints are implemented as Next.js App Router Route Han
   - `404 Not Found`: Job does not exist.
   - `429 Too Many Requests`: Rate limit exceeded.
 
-## 3. Report Administration Endpoints (Phase 5)
+### POST /api/jobs/saved (Phase 6)
+
+- **Description**: Bulk resolves job IDs stored in the visitor's browser `localStorage` into active job objects for `/saved`. Excludes expired and non-published posts.
+- **Authentication**: None.
+- **Request Body**: `{ ids: string[] }` (max 50 IDs).
+- **Responses**: `200 OK` with `{ jobs: Job[] }`.
+
+### POST /api/alerts/subscribe (Phase 6)
+
+- **Description**: Registers a visitor email address with optional preferences for job types and graduation batches. Dispatches double opt-in verification email.
+- **Authentication**: None.
+- **Request Body**: `{ email, preferences?: { types?: string[], batches?: number[] } }`.
+- **Responses**: `200 OK` with confirmation message.
+
+### GET /api/alerts/confirm (Phase 6)
+
+- **Description**: Validates cryptographic verification token and confirms subscriber status.
+- **Authentication**: None.
+- **Query Parameters**: `token` (hex string).
+- **Responses**: Redirects to home page with query param `confirmed=1`.
+
+### GET /api/alerts/unsubscribe (Phase 6)
+
+- **Description**: RFC-compliant one-click unsubscription link included in all email alerts. Removes subscriber record.
+- **Authentication**: None.
+- **Query Parameters**: `token` (hex string).
+- **Responses**: Redirects to home page with query param `unsubscribed=1`.
+
+### GET /feed.xml (Phase 6)
+
+- **Description**: Returns live RSS 2.0 XML syndication feed of top 25 non-expired published jobs.
+- **Authentication**: None.
+- **Headers Returned**: `Content-Type: application/rss+xml; charset=utf-8`, `Cache-Control: public, max-age=1800, stale-while-revalidate=3600`.
+
+## 3. Guide Administration Endpoints (Phase 6)
+
+### GET /api/admin/guides
+
+- **Description**: Lists career guides with pagination and search. Contributors see only their guides; Admins see all guides.
+- **Authentication**: Authenticated (`contributor` or `admin`).
+
+### POST /api/admin/guides
+
+- **Description**: Authors a new guide. Computes estimated reading time and generates unique slug.
+- **Authentication**: Authenticated (`contributor` or `admin`).
+- **Request Body**: `{ title, summary, body, status }`.
+
+### GET /api/admin/guides/[id]
+
+- **Description**: Retrieves single guide for editing. Enforces contributor author isolation (HTTP 403).
+- **Authentication**: Authenticated.
+
+### PUT /api/admin/guides/[id]
+
+- **Description**: Updates guide title, body, status, or summary. Recalculates reading time.
+- **Authentication**: Authenticated.
+
+### DELETE /api/admin/guides/[id]
+
+- **Description**: Deletes a guide. Contributors can only delete their own guides.
+- **Authentication**: Authenticated.
+
+## 4. Report Administration Endpoints (Phase 5)
 
 ### GET /api/admin/reports
 

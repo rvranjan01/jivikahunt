@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import CompanyLogo from '@/components/CompanyLogo';
+import SaveJobButton from '@/components/SaveJobButton';
 import { formatIST } from '@/lib/time';
 
 const TYPE_STYLES = {
@@ -39,15 +40,20 @@ export default function JobCard({ job }) {
           />
 
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="truncate text-xs font-semibold tracking-wide text-slate-500 uppercase">
-                {job.company?.name}
-              </span>
-              {job.featured && (
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
-                  Sponsored
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="truncate text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                  {job.company?.name}
                 </span>
-              )}
+                {job.featured && (
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                    Sponsored
+                  </span>
+                )}
+              </div>
+              <div className="relative z-10">
+                <SaveJobButton jobId={job._id.toString()} />
+              </div>
             </div>
 
             <h2 className="mt-1 text-base font-bold text-slate-900 group-hover:text-blue-600">

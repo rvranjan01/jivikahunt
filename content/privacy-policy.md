@@ -1,7 +1,7 @@
 # Privacy Policy
 
-**Effective Date:** [TO FILL: e.g., 12 November 2026]  
-**Last Updated:** [TO FILL: e.g., 12 November 2026]
+**Effective Date:** 12 November 2026
+**Last Updated:** 12 November 2026
 
 At **JivikaHunt** (accessible from https://jivikahunt.com), the privacy of our visitors is of paramount importance. This Privacy Policy outlines the types of information we collect, how we use it, and how your data is protected.
 
@@ -64,6 +64,6 @@ JivikaHunt does not knowingly collect personally identifiable information from c
 
 For questions or concerns regarding this Privacy Policy:
 
-- **Data Controller**: [TO FILL: Legal Entity Name / Founder Name]
-- **Postal Address**: [TO FILL: Physical Business Address, City, State, PIN, India]
+- **Data Controller**: Ranjan Kumar Verma
+- **Postal Address**: BTM 2nd Stage Near Geeky Ants, bangalore, Karnataka,India
 - **Data Protection Officer / Inquiries**: contact@jivikahunt.com

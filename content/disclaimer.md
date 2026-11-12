@@ -46,6 +46,6 @@ While our team strives to ensure that all job details, qualifications, eligibili
 
 Under no circumstances shall JivikaHunt, its founders, operators, or contributors be held liable for any direct, indirect, incidental, or consequential losses arising from the use of the site or reliance on any job listing published herein.
 
-- **Entity Name**: [TO FILL: JivikaHunt Entity / Founder Legal Name]
-- **Last Updated**: [TO FILL: e.g., November 2026]
+- **Entity Name**: Ranjan Kumar Verma
+- **Last Updated**: November 2026
 - **Contact**: contact@jivikahunt.com

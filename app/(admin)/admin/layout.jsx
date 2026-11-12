@@ -44,6 +44,12 @@ export default async function AdminLayout({ children }) {
               >
                 Jobs
               </Link>
+              <Link
+                href="/admin/guides"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              >
+                Guides
+              </Link>
               {isAdmin && (
                 <>
                   <Link

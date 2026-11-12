@@ -6,6 +6,7 @@ import ShareButtons from '@/components/ShareButtons';
 import AuthorBox from '@/components/AuthorBox';
 import JobCard from '@/components/JobCard';
 import ReportButton from '@/components/ReportButton';
+import SaveJobButton from '@/components/SaveJobButton';
 import { getPublicJobBySlug, getRelatedJobs } from '@/lib/publicJobs';
 import { formatIST } from '@/lib/time';
 import { generateJobPostingJsonLd } from '@/lib/jsonLd';
@@ -161,15 +162,18 @@ export default async function JobDetailPage({ params }) {
           />
 
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-                {job.company?.name}
-              </span>
-              {job.featured && (
-                <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">
-                  Sponsored
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">
+                  {job.company?.name}
                 </span>
-              )}
+                {job.featured && (
+                  <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">
+                    Sponsored
+                  </span>
+                )}
+              </div>
+              <SaveJobButton jobId={job._id.toString()} showLabel={true} />
             </div>
 
             <h1 className="mt-1 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
