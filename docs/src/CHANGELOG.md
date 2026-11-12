@@ -4,6 +4,24 @@ All notable changes to the JivikaHunt project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-11-12
+
+### Added
+
+- **Phase 3 Admin Job Ingestion & Management Engine**:
+  - `Job` Mongoose model with compound indexes (`status`, `createdAt`, `type`, `workMode`, `batches`, `skills`, `company.slug`) and text index on title and company name.
+  - Strict URL validation rejecting insecure HTTP, embedded credentials, and URL shorteners (`bit.ly`, `tinyurl.com`, `t.co`, etc.).
+  - Automatic collision-resistant slug generator (`lib/slug.js`) supporting `${title}-at-${company}` format with numeric collision suffixes.
+  - Asia/Kolkata (IST) deadline and expiry engine (`lib/time.js`) computing end-of-day (23:59:59.999 IST = 18:29:59.999 UTC).
+  - Contributor daily quota manager (`lib/quota.js`) capping contributors at 30 posts per 24 hours while exempting admins.
+  - Non-blocking Telegram Bot client (`lib/telegram.js`) auto-posting published jobs to the Telegram channel without stalling job publication.
+  - WhatsApp broadcast formatter (`formatWhatsAppJobMessage`) and one-click copy button on job rows.
+  - Duplicate posting detector warning contributors if matching company + title + applyUrl already exists, with override capability.
+  - Interactive job creation form (`/admin/jobs/new`) with integrated ChatGPT extraction prompt helper panel and instant copy button.
+  - Interactive job edit form (`/admin/jobs/[id]/edit`) and filtered management table (`/admin/jobs`).
+  - Strict contributor permission isolation: contributors can only view, edit, and delete their own posts, while admins can manage all jobs.
+  - Complete test suite: 105 tests passing across 15 test files covering slug generation, IST deadlines, URL validators, duplicate detection, daily quotas, and contributor isolation.
+
 ## [0.3.0] - 2026-11-12
 
 ### Added
@@ -15,7 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - High-performance binary delivery route `/img/[id]` with MD5-based ETag calculation, HTTP `304 Not Modified` conditional response, and `Cache-Control: public, max-age=31536000, immutable`.
   - Secure authenticated upload route `/api/admin/upload` with 1 MB ceiling and audit logging.
   - Reusable `components/CompanyLogo.jsx` component featuring automatic high-contrast company initials avatar fallback with deterministic palette hashing.
-  - Complete test coverage: 70 passing tests across 11 test suites covering image upload rejection, magic byte detection, Sharp processing, initials derivation, and ETag caching.
 
 ## [0.2.0] - 2026-11-12
 
@@ -30,9 +47,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Contributor management portal (`/admin/users`) with random temporary password generator and invitation flow.
   - Mandatory first-login password change (`mustChangePassword`) at `/admin/change-password`.
   - Instant session revocation on password update or account deactivation.
-  - Local development email outbox fallback for Resend when API key is unconfigured.
-  - Admin seeding script (`scripts/seed-admin.js`) outputting TOTP secret and authenticator URI.
-  - Full test suite: 49 passing tests across unit and API suites covering all security, auth, and role isolation rules.
 
 ## [0.1.0] - 2026-11-12
 
@@ -42,10 +56,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configured Tailwind CSS v4, PostCSS, ESLint flat config, Prettier, and Vitest test runner.
 - Configured Playwright end-to-end testing harness with desktop and mobile viewports.
 - Configured GitHub Actions CI workflow covering linting, security audit, unit/API tests, and documentation builds.
-- Created `lib/siteConfig.js` containing centralized site metadata, social community links, and navigation items.
-- Created `.env.example` documenting all configuration keys and secret requirements.
-- Implemented `lib/db.js` providing cached singleton Mongoose connection management.
-- Implemented `/api/health` route handler reporting system uptime, DB connectivity, and response latency.
-- Established documentation skeleton in `docs/src` with 13 comprehensive guides and `CHANGELOG.md`.
-- Implemented `scripts/build-docs.js` converting Markdown documentation into structured `.docx` files.
-- Added comprehensive `README.md` with step-by-step local setup instructions.
+- Created `lib/siteConfig.js`, `.env.example`, `lib/db.js`, `/api/health`, documentation skeleton, and Word builder.

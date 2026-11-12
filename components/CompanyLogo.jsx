@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { getInitials } from '@/lib/image';
+import { getInitials } from '@/lib/formatters';
 
 const COLOR_PALETTE = [
   'bg-blue-600 text-white',

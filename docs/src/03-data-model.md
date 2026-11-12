@@ -12,51 +12,77 @@ JivikaHunt stores its application data in MongoDB Atlas using Mongoose ODM. Ever
 | `LoginAttempt` | `loginattempts` | Temporary TTL records tracking failed logins to prevent brute force.     | **Implemented (Phase 1)** |
 | `AuditLog`     | `auditlogs`     | Immutable audit trail for all admin actions and auth events.             | **Implemented (Phase 1)** |
 | `Image`        | `images`        | WebP binary images stored directly in database to survive dyno restarts. | **Implemented (Phase 2)** |
-| `Job`          | `jobs`          | Full job listings, company profiles, and application links.              | Scheduled (Phase 3)       |
+| `Job`          | `jobs`          | Full job listings, company profiles, and application links.              | **Implemented (Phase 3)** |
 | `Report`       | `reports`       | Public reports for broken links, expired posts, or scams.                | Scheduled (Phase 5)       |
 | `Guide`        | `guides`        | Career guidance and interview preparation articles.                      | Scheduled (Phase 6)       |
 | `Subscriber`   | `subscribers`   | Double opt-in email alert subscribers.                                   | Scheduled (Phase 6)       |
 
 ## 3. Implemented Schemas
 
+### Job Schema (`models/Job.js` — Phase 3)
+
+- `title` (String, required, max 120 chars): Job title (e.g., "Software Developer Trainee").
+- `slug` (String, required, unique, indexed): URL-safe unique slug in format `${title}-at-${company}`.
+- `company` (Subdocument, required):
+  - `name` (String, required, max 100 chars): Company brand name.
+  - `slug` (String, required, indexed): Kebab-case company slug.
+  - `logoId` (ObjectId, ref: Image, optional): Reference to processed WebP logo.
+  - `description` (String, optional, max 1000 chars): Short company background.
+- `type` (String, enum: `['fresher', 'intern', 'experienced']`, required, indexed).
+- `workMode` (String, enum: `['onsite', 'hybrid', 'remote']`, required, indexed).
+- `locations` (Array of Strings, required, min 1 location).
+- `batches` (Array of Numbers, indexed): Eligible graduation years (e.g. `[2024, 2025]`).
+- `salary` (String, optional, max 100 chars): Compensation/stipend text.
+- `skills` (Array of Strings, indexed): Normalized lowercase keywords.
+- `summary` (String, required, min 40, max 2000 chars): Core opportunity overview.
+- `responsibilities` (Array of Strings): Role duties.
+- `eligibility` (Array of Strings): Degree and criteria requirements.
+- `applyUrl` (String, required): Strict HTTPS careers URL without credentials or shorteners.
+- `lastDate` (Date, optional): Application deadline. Expiry is evaluated at 23:59:59.999 IST on this date.
+- `status` (String, enum: `['draft', 'scheduled', 'published', 'unpublished']`, default: `'draft'`, indexed).
+- `publishAt` (Date, optional): Scheduled release timestamp.
+- `featured` (Boolean, default: false): Flag for sponsored listings.
+- `views` (Number, default: 0): Total impressions.
+- `createdBy` (ObjectId, ref: User, required, indexed): Author user reference.
+- `postedByName` (String, required): Preserved contributor displayName at creation.
+- **Indexes**:
+  - `{ slug: 1 }` (unique)
+  - `{ status: 1, createdAt: -1 }`
+  - `{ status: 1, type: 1 }`
+  - `{ status: 1, workMode: 1 }`
+  - `{ status: 1, batches: 1 }`
+  - `{ status: 1, skills: 1 }`
+  - `{ 'company.slug': 1, status: 1 }`
+  - Text Index: `{ title: 'text', 'company.name': 'text' }`
+
 ### Image Schema (`models/Image.js` — Phase 2)
 
-- `contentType` (String, default: `'image/webp'`): Media MIME type, strictly standardized to WebP.
+- `contentType` (String, default: `'image/webp'`): Media MIME type.
 - `data` (Buffer, required): Binary WebP payload (max 1 MB).
-- `width` (Number, required): Image width in pixels.
-- `height` (Number, required): Image height in pixels.
-- `ownerId` (ObjectId, ref: User, default: null, indexed): Contributor or admin who uploaded the asset.
-- `createdAt` (Date): Creation timestamp, indexed chronologically descending (`{ createdAt: -1 }`).
+- `width` & `height` (Number, required): Dimensions in pixels.
+- `ownerId` (ObjectId, ref: User, default: null, indexed).
+- `createdAt` (Date, indexed: `{ createdAt: -1 }`).
 
 ### User Schema (`models/User.js` — Phase 1)
 
-- `name` (String, required): Full legal name of the contributor or admin.
-- `displayName` (String, required): Name shown publicly on job postings and author box.
-- `email` (String, required, unique, lowercase, indexed): Login email address.
-- `passwordHash` (String, required): bcryptjs hash with 10 salt rounds.
-- `role` (String, enum: `admin`, `contributor`, default: `contributor`, indexed): Permissions level.
-- `isActive` (Boolean, default: true, indexed): Re-checked against MongoDB on every admin API call.
-- `mustChangePassword` (Boolean, default: true for invited users): Forces password change on initial login.
-- `tokenVersion` (Number, default: 1): Incremented on password change or deactivation to immediately revoke all issued JWTs.
-- `totpSecret` (String, default: null): 32-character Base32 secret for TOTP two-factor authentication (admin only).
-- `bio` (String, max 250 characters, default: ''): Contributor biography shown in the public author box.
-- `photoId` (ObjectId, ref: Image, default: null): Profile avatar image.
-- `createdAt` & `updatedAt` (Date): Timestamps managed by Mongoose.
+- `name` & `displayName` (String, required).
+- `email` (String, required, unique, lowercase, indexed).
+- `passwordHash` (String, required): bcryptjs hash.
+- `role` (String, enum: `admin`, `contributor`, default: `contributor`, indexed).
+- `isActive` (Boolean, default: true, indexed).
+- `mustChangePassword` (Boolean, default: true).
+- `tokenVersion` (Number, default: 1).
+- `totpSecret` (String, default: null).
+- `bio` (String, max 250 characters).
 
 ### LoginAttempt Schema (`models/LoginAttempt.js` — Phase 1)
 
-- `key` (String, required, unique, indexed): Identifier tracked (e.g. `ip:203.0.113.1` or `email:contributor@example.com`).
-- `attempts` (Number, default: 1): Consecutive failed login count.
-- `lockedUntil` (Date, default: null): If set, login requests for this key receive HTTP 429 until this timestamp passes.
-- `expiresAt` (Date, required, indexed with `expires: 0`): MongoDB TTL index automatically deleting records 1 hour after creation.
+- `key` (String, required, unique, indexed): IP or email identifier.
+- `attempts` (Number, default: 1).
+- `lockedUntil` (Date, default: null).
+- `expiresAt` (Date, required, TTL index: `{ expires: 0 }`).
 
 ### AuditLog Schema (`models/AuditLog.js` — Phase 1)
 
-- `action` (String, required, indexed): Action code (e.g. `login.success`, `user.create`, `image.upload`).
-- `actorId` (ObjectId, ref: User, default: null, indexed): ID of the user performing the action.
-- `actorEmail` (String, default: null): Email address of actor.
-- `targetType` (String, default: null, indexed): Target entity class (`User`, `Image`, etc.).
-- `targetId` (String, default: null): Identifier of target entity.
-- `metadata` (Mixed, default: {}): Sanitized action details.
-- `ipHash` (String, default: null): Salted SHA-256 IP hash for auditing without privacy violation.
-- `createdAt` (Date): Timestamp of action, indexed chronologically descending (`{ createdAt: -1 }`).
+- `action`, `actorId`, `actorEmail`, `targetType`, `targetId`, `metadata`, `ipHash`.
+- Indexed: `{ createdAt: -1 }`.
