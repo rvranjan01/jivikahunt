@@ -13,7 +13,7 @@ JivikaHunt stores its application data in MongoDB Atlas using Mongoose ODM. Ever
 | `AuditLog`     | `auditlogs`     | Immutable audit trail for all admin actions and auth events.             | **Implemented (Phase 1)** |
 | `Image`        | `images`        | WebP binary images stored directly in database to survive dyno restarts. | **Implemented (Phase 2)** |
 | `Job`          | `jobs`          | Full job listings, company profiles, and application links.              | **Implemented (Phase 3)** |
-| `Report`       | `reports`       | Public reports for broken links, expired posts, or scams.                | Scheduled (Phase 5)       |
+| `Report`       | `reports`       | Public reports for broken links, expired posts, or scams.                | **Implemented (Phase 5)** |
 | `Guide`        | `guides`        | Career guidance and interview preparation articles.                      | Scheduled (Phase 6)       |
 | `Subscriber`   | `subscribers`   | Double opt-in email alert subscribers.                                   | Scheduled (Phase 6)       |
 
@@ -58,6 +58,24 @@ JivikaHunt stores its application data in MongoDB Atlas using Mongoose ODM. Ever
 ### Image Schema (`models/Image.js` — Phase 2)
 
 - `contentType` (String, default: `'image/webp'`): Media MIME type.
+- `data` (Buffer, required): Sharp-processed binary WebP image payload.
+- `width` (Number, required): Scaled width in pixels.
+- `height` (Number, required): Scaled height in pixels.
+- `ownerId` (ObjectId, ref: User, required): User who uploaded the image.
+- `createdAt` (Date, default: Date.now): Upload timestamp.
+
+### Report Schema (`models/Report.js` — Phase 5)
+
+- `jobId` (ObjectId, ref: Job, required, indexed): Reference to reported job post.
+- `reason` (String, enum: `['broken_link', 'expired', 'scam', 'other']`, required, indexed): Classified reason.
+- `note` (String, max 300 chars, default: ''): Optional context provided by public reporter.
+- `ipHash` (String, required, indexed): Salted SHA-256 hash of client IP for privacy-preserving rate limiting.
+- `status` (String, enum: `['open', 'resolved']`, default: `'open'`, indexed): Moderation status.
+- `createdAt` (Date, default: Date.now, indexed): Report timestamp.
+- **Indexes**:
+  - `{ status: 1, createdAt: -1 }`
+  - `{ jobId: 1, status: 1 }`
+
 - `data` (Buffer, required): Binary WebP payload (max 1 MB).
 - `width` & `height` (Number, required): Dimensions in pixels.
 - `ownerId` (ObjectId, ref: User, default: null, indexed).

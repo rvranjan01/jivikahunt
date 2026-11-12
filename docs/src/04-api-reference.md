@@ -18,7 +18,31 @@ All JivikaHunt backend endpoints are implemented as Next.js App Router Route Han
 - **Authentication**: None.
 - **Headers Returned**: `Content-Type: image/webp`, `Cache-Control: public, max-age=31536000, immutable`, `ETag`. Returns `304 Not Modified` on matching `If-None-Match`.
 
-## 3. Job Administration Endpoints (Phase 3)
+### POST /api/reports (Phase 5)
+
+- **Description**: Allows public visitors to report broken career links, expired roles, scams, or errors. Zero authentication required.
+- **Authentication**: None. Rate-limited by salted IP hash (max 5 reports per hour).
+- **Request Body**: `{ jobId, reason: 'broken_link' | 'expired' | 'scam' | 'other', note?: string }`.
+- **Responses**:
+  - `201 Created`: Report logged and queued for admin moderation.
+  - `400 Bad Request`: Validation failure.
+  - `404 Not Found`: Job does not exist.
+  - `429 Too Many Requests`: Rate limit exceeded.
+
+## 3. Report Administration Endpoints (Phase 5)
+
+### GET /api/admin/reports
+
+- **Description**: Lists user-submitted reports with status filtering (`open`, `resolved`, `all`).
+- **Authentication**: Authenticated (`admin` only).
+
+### PATCH /api/admin/reports/[id]
+
+- **Description**: Resolves or reopens a report. Records audit log.
+- **Authentication**: Authenticated (`admin` only).
+- **Request Body**: `{ status: 'open' | 'resolved' }`.
+
+## 4. Job Administration Endpoints (Phase 3)
 
 ### GET /api/admin/jobs
 

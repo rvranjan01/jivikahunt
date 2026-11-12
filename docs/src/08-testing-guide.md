@@ -11,7 +11,7 @@ JivikaHunt implements a three-tier test automation strategy:
 ## 2. Running Tests
 
 ```bash
-# Run all unit and API tests with Vitest (120 tests across 18 suites)
+# Run all unit and API tests with Vitest (134 tests across 22 suites)
 npm test
 
 # Run Vitest in interactive watch mode during development
@@ -47,3 +47,8 @@ npm run test:e2e
 | TC-20   | Unit     | Public query builder    | Generates MongoDB filters for `type`, `workMode`, `batch`, `location`, and `q`. | Passed |
 | TC-21   | API      | Contributor privacy     | Public job detail response never exposes contributor personal email address.    | Passed |
 | TC-22   | API      | Expired job filtering   | Excludes expired jobs from lists; marks expired detail views with noindex.      | Passed |
+| TC-23   | Unit     | JobPosting JSON-LD      | Generates schema.org compliant data (`validThrough`, `directApply: false`).     | Passed |
+| TC-24   | Unit     | SEO Indexing Threshold  | Flags `noindex` when < 3 jobs exist; enables indexing when >= 3 jobs exist.     | Passed |
+| TC-25   | Unit     | Robots & Sitemap        | robots.txt disallows admin/api; sitemap includes active jobs and companies.     | Passed |
+| TC-26   | API      | Broken Link Reporting   | Allows public reports; enforces 5 reports/hr rate limit per IP with HTTP 429.   | Passed |
+| TC-27   | API      | Report Moderation       | Admin lists and resolves reports; contributors restricted with HTTP 403.        | Passed |

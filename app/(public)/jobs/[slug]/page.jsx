@@ -5,14 +5,16 @@ import AdSlot from '@/components/AdSlot';
 import ShareButtons from '@/components/ShareButtons';
 import AuthorBox from '@/components/AuthorBox';
 import JobCard from '@/components/JobCard';
+import ReportButton from '@/components/ReportButton';
 import { getPublicJobBySlug, getRelatedJobs } from '@/lib/publicJobs';
 import { formatIST } from '@/lib/time';
+import { generateJobPostingJsonLd } from '@/lib/jsonLd';
 import siteConfig from '@/lib/siteConfig';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Dynamic metadata generator with canonical URLs and expired job noindex enforcement.
+ * Dynamic metadata generator with canonical URLs, Open Graph, Twitter cards, and expired job noindex enforcement.
  *
  * @param {Object} props
  * @param {Promise<{ slug: string }>} props.params
@@ -31,12 +33,30 @@ export async function generateMetadata({ params }) {
 
   const { job, isExpired } = result;
   const canonicalUrl = `${siteConfig.url}/jobs/${job.slug}`;
+  const title = `${job.title} at ${job.company?.name}`;
+  const description = job.summary ? job.summary.slice(0, 160) : siteConfig.description;
 
   return {
-    title: `${job.title} at ${job.company?.name}`,
-    description: job.summary ? job.summary.slice(0, 160) : siteConfig.description,
+    title,
+    description,
     alternates: {
       canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: siteConfig.name,
+      locale: 'en_IN',
+      type: 'article',
+      images: job.company?.logoId
+        ? [{ url: `${siteConfig.url}/img/${job.company.logoId}`, alt: `${job.company.name} logo` }]
+        : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
     robots: isExpired ? { index: false, follow: true } : { index: true, follow: true },
   };
@@ -342,18 +362,23 @@ export default async function JobDetailPage({ params }) {
               </a>
 
               {/* 10. Report Broken Link Button */}
-              <button
-                type="button"
-                id="report-broken-link-btn"
-                title="Report broken application link, scam, or incorrect details"
-                className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-800"
-              >
-                Report Broken Link
-              </button>
+              <ReportButton
+                jobId={job._id.toString()}
+                jobTitle={job.title}
+                companyName={job.company?.name}
+              />
             </div>
           )}
         </div>
       </div>
+
+      {/* Structured Data: schema.org JobPosting JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(generateJobPostingJsonLd(job)),
+        }}
+      />
 
       {/* 11. Related Jobs (max 4) */}
       {relatedJobs.length > 0 && (

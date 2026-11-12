@@ -4,6 +4,29 @@ All notable changes to the JivikaHunt project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-11-12
+
+### Added
+
+- **Phase 5 SEO, Structured Data, Sitemaps & Broken Link Reporting**:
+  - `JobPosting` schema.org JSON-LD generator (`lib/jsonLd.js`) conforming to Google Search Central requirements (`validThrough` in ISO IST, `directApply: false`, `jobLocationType: 'TELECOMMUTE'` for remote roles, structured hiring organization).
+  - OpenGraph & Twitter card metadata tags attached to job detail pages.
+  - Dynamic XML Sitemap (`app/sitemap.js`) indexing published, non-expired jobs, company profiles, and category hubs, strictly omitting expired jobs.
+  - Search engine directives (`app/robots.js`) disallowing `/admin/`, `/api/`, and `/saved` while exposing the canonical sitemap.
+  - Programmatic SEO landing pages:
+    - `/jobs/skill/[skill]` (e.g. `/jobs/skill/python`, `/jobs/skill/react`)
+    - `/jobs/location/[city]` (e.g. `/jobs/location/bengaluru`, `/jobs/location/pune`)
+    - `/jobs/batch/[year]` (e.g. `/jobs/batch/2025`, `/jobs/batch/2026`)
+    - `/jobs/type/[type]` (e.g. `/jobs/type/fresher`, `/jobs/type/intern`)
+    - `/companies/[slug]` (e.g. `/companies/techcorp`)
+  - Strict SEO quality safeguard: returns HTTP 404 when 0 jobs exist, and injects `<meta name="robots" content="noindex" />` when fewer than 3 jobs exist.
+  - `Report` Mongoose model (`models/Report.js`) for user submissions on broken links, expired vacancies, scams, and inaccurate information.
+  - Public broken link reporting API (`POST /api/reports`) rate-limited by salted IP hash (max 5 submissions per hour).
+  - Interactive report modal (`components/ReportJobModal.jsx` & `components/ReportButton.jsx`) integrated seamlessly into job detail pages.
+  - Admin report moderation endpoints (`GET /api/admin/reports` & `PATCH /api/admin/reports/[id]`) restricted to admin role.
+  - Admin moderation interface (`app/(admin)/admin/reports/page.jsx`) with status tabs (open/resolved/all) and one-click resolution.
+  - Unit and API test suite expanded to 134 passing tests across 22 test files.
+
 ## [0.5.0] - 2026-11-12
 
 ### Added

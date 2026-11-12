@@ -18,8 +18,13 @@ Every job listing includes Google Jobs compliant JSON-LD structured data:
 
 ### Programmatic Landing Pages
 
-- URLs: `/jobs/skill/[skill]`, `/jobs/location/[city]`, `/jobs/batch/[year]`, `/jobs/type/[type]`.
+- URLs: `/jobs/skill/[skill]`, `/jobs/location/[city]`, `/jobs/batch/[year]`, `/jobs/type/[type]`, `/companies/[slug]`.
 - **Quality Safeguard**: Returns HTTP `404` if 0 jobs exist. Renders `<meta name="robots" content="noindex" />` if fewer than 3 jobs exist, preventing thin content search penalties.
+
+### Dynamic Sitemap & Robots.txt
+
+- **Dynamic Sitemap (`/sitemap.xml`)**: Built via Next.js App Router metadata route. Indexes only active published jobs (dynamically excluding expired vacancies based on IST deadline), static policy pages, category hubs, and company landing pages.
+- **Robots.txt (`/robots.txt`)**: Explicitly disallows `/admin/`, `/api/`, and `/saved`; permits crawling of all public routes; references the dynamic sitemap.
 
 ## 2. Google AdSense Implementation
 
