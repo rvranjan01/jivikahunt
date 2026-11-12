@@ -4,6 +4,23 @@ All notable changes to the JivikaHunt project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-11-12
+
+### Added
+
+- **Phase 1 Authentication & User Management**:
+  - `User`, `LoginAttempt`, and `AuditLog` Mongoose models with TTL indexing and compound indexes.
+  - Session management using Jose JWTs with `httpOnly`, `Secure`, `SameSite=Lax` cookies (`jh_session`).
+  - Active session validation middleware with database re-check (`isActive`) and `tokenVersion` matching.
+  - Brute-force protection: dual-key rate limiting (per IP and per email) with 15-minute lockout after 5 consecutive failures.
+  - Two-Factor Authentication (TOTP 2FA) for administrators via `otplib` and QR code onboarding via `qrcode`.
+  - Contributor management portal (`/admin/users`) with random temporary password generator and invitation flow.
+  - Mandatory first-login password change (`mustChangePassword`) at `/admin/change-password`.
+  - Instant session revocation on password update or account deactivation.
+  - Local development email outbox fallback for Resend when API key is unconfigured.
+  - Admin seeding script (`scripts/seed-admin.js`) outputting TOTP secret and authenticator URI.
+  - Full test suite: 49 passing tests across unit and API suites covering all security, auth, and role isolation rules.
+
 ## [0.1.0] - 2026-11-12
 
 ### Added

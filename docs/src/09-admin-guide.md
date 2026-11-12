@@ -1,33 +1,51 @@
 # 09 — Administrator Guide
 
-## 1. Accessing the Admin Area
+## 1. Initial Admin Account Setup
 
-The management portal is located at `/admin/login`.
+To initialize the first administrative user, execute the local seed script:
 
-- **Credentials**: Email and password.
-- **Two-Factor Authentication**: Administrators must provide a 6-digit TOTP code from their mobile authenticator app (Google Authenticator, Microsoft Authenticator, or 1Password).
+```bash
+node scripts/seed-admin.js <adminEmail> <adminPassword>
+```
 
-## 2. Managing Users & Contributors
+Example:
+
+```bash
+node scripts/seed-admin.js admin@jivikahunt.com AdminPass123!
+```
+
+The script will output:
+
+- **Email & Password**: Administrative credentials.
+- **TOTP Secret**: A 32-character Base32 secret string.
+- **Authenticator URI**: Can be imported directly into Google Authenticator, Microsoft Authenticator, or 1Password.
+
+## 2. Accessing the Staff Portal
+
+1. Navigate to `/admin/login`.
+2. Enter your administrator email and password.
+3. Click "Sign In". The portal will prompt for your 6-digit TOTP code.
+4. Enter the code from your authenticator app to complete login.
+
+## 3. Managing Users & Contributors
 
 Admins have full authority to manage contributor accounts at `/admin/users`:
 
-1. **Inviting a Contributor**:
-   - Click "Invite Contributor".
-   - Enter full name, display name, and email.
-   - The system generates a temporary password and sends a welcome invite via Resend.
-   - On their first login, the contributor is required to create a new password.
-2. **Deactivating an Account**:
-   - In `/admin/users`, toggle the "Active" status switch off.
-   - The user's active session is revoked immediately via `tokenVersion` increment.
+### Inviting a New Contributor
 
-## 3. Reviewing Reports
+1. Click **+ Invite Contributor** on `/admin/users`.
+2. Fill in:
+   - **Full Name**: e.g., "Rahul Sharma".
+   - **Public Display Name**: e.g., "Rahul S." (shown on job cards and author box).
+   - **Email Address**: Contributor's login email.
+   - **Short Bio**: Optional 250-character bio.
+3. Click **Send Invitation**.
+4. The system generates a 14-character secure temporary password, dispatches the welcome invite via Resend (or prints to console in local development), and displays the temporary password in the modal for easy copying.
+5. On their first login, the contributor will be forced to set their own secure password.
 
-Users can report broken links or issues using the "Report broken link" button on any job page.
+### Deactivating a Contributor
 
-- Reports appear in the queue at `/admin/reports`.
-- Admins can investigate the destination careers link, update the job posting, or mark the report resolved.
-
-## 4. Global Job Operations
-
-- Admins can edit, unpublish, or delete any job posting on the platform.
-- Admins can pin high-value listings as "Sponsored" / "Featured" which display a distinct badge.
+1. On `/admin/users`, locate the contributor in the table.
+2. Click **Deactivate**.
+3. The account's `isActive` flag is set to `false` and its `tokenVersion` is incremented. All active JWT sessions for that contributor are revoked immediately.
+4. Admins cannot deactivate their own account.

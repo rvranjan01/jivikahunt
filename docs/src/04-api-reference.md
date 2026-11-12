@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-All JivikaHunt backend services are exposed via Next.js App Router Route Handlers (`app/api/**/route.js`). Responses use standard JSON formatting with explicit HTTP status codes.
+All JivikaHunt backend endpoints are implemented as Next.js App Router Route Handlers (`app/api/**/route.js`). Responses use standard JSON formatting with explicit HTTP status codes.
 
 ## 2. Public Endpoints
 
@@ -10,62 +10,91 @@ All JivikaHunt backend services are exposed via Next.js App Router Route Handler
 
 - **Description**: Verifies service uptime and database connectivity.
 - **Authentication**: None.
-- **Response Example**:
-
-```json
-{
-  "status": "ok",
-  "service": "jivikahunt",
-  "timestamp": "2026-11-12T12:00:00.000Z",
-  "uptimeSeconds": 1420,
-  "database": "connected",
-  "responseTimeMs": 12,
-  "environment": "production"
-}
-```
-
-### POST /api/reports
-
-- **Description**: Submits a report for a broken, expired, or fraudulent job link.
-- **Authentication**: None (Rate limited by salted IP hash).
-- **Body Payload**:
-
-```json
-{
-  "jobId": "65b89a...",
-  "reason": "broken_link",
-  "note": "Company portal returns 404 page."
-}
-```
-
-### POST /api/alerts/subscribe
-
-- **Description**: Registers an email address for job alerts and sends a double opt-in confirmation email.
-- **Authentication**: None.
+- **Response**: Status `ok` (HTTP 200) or `degraded` (HTTP 503). Includes uptime, database state, and timestamp.
 
 ## 3. Authentication Endpoints
 
 ### POST /api/auth/login
 
-- **Description**: Authenticates contributor or admin credentials. Sets an `httpOnly`, `Secure`, `SameSite=Lax` cookie.
-- **Rate Limit**: Max 5 attempts per IP and per email before temporary lock.
-- **Body**: `{ "email": "admin@jivikahunt.com", "password": "...", "totpCode": "123456" }`
+- **Description**: Authenticates user credentials with brute-force rate-limiting and mandatory admin TOTP 2FA. Sets httpOnly `jh_session` cookie on success.
+- **Rate Limit**: Max 5 failed attempts per IP and per email before temporary 15-minute lock.
+- **Request Body**:
+
+```json
+{
+  "email": "admin@jivikahunt.com",
+  "password": "••••••••••••",
+  "totpCode": "123456"
+}
+```
+
+- **Responses**:
+  - `200 OK`: `{ "success": true, "user": { "id": "...", "email": "...", "role": "admin", "mustChangePassword": false } }` (Sets cookie).
+  - `200 OK (2FA Challenge)`: `{ "requires2FA": true, "message": "Please provide the 6-digit 2FA code..." }`
+  - `401 Unauthorized`: `{ "error": "Invalid email or password." }` or `{ "error": "Invalid 2FA code." }`
+  - `403 Forbidden`: `{ "error": "Account is deactivated..." }`
+  - `429 Too Many Requests`: `{ "error": "Account temporarily locked...", "remainingSeconds": 900 }`
+
+### POST /api/auth/logout
+
+- **Description**: Clears session cookie and records audit log event.
+- **Authentication**: Authenticated user.
+
+### GET /api/auth/me
+
+- **Description**: Inspects current session cookie and returns user profile. Re-verifies user is active and tokenVersion matches database.
+- **Authentication**: Authenticated user.
 
 ### POST /api/auth/change-password
 
-- **Description**: Updates password for logged-in user. Required on first login.
-- **Body**: `{ "currentPassword": "...", "newPassword": "..." }`
+- **Description**: Changes password for the active user. Mandatory on first contributor login. Increments `tokenVersion` to revoke all other active sessions across devices.
+- **Authentication**: Authenticated user.
+- **Request Body**:
 
-## 4. Admin & Contributor Endpoints
+```json
+{
+  "currentPassword": "••••••••••••",
+  "newPassword": "••••••••••••"
+}
+```
 
-### GET /api/admin/jobs
+## 4. Admin User Management Endpoints
 
-- **Description**: Lists jobs. Contributors see their own postings; Admins see all.
+### GET /api/admin/users
 
-### POST /api/admin/jobs
+- **Description**: Lists all registered staff and contributors with their status and roles.
+- **Authentication**: Admin only (HTTP 403 for contributors).
 
-- **Description**: Creates and publishes a job. Capped at 30 new jobs per 24 hours for contributors.
+### POST /api/admin/users
 
-### POST /api/admin/upload
+- **Description**: Creates a new contributor account, generates a 14-character secure random temporary password, and sends an email invitation via Resend (or logs to console in local development).
+- **Authentication**: Admin only.
+- **Request Body**:
 
-- **Description**: Uploads a company logo (max 160x160) or avatar (max 256x256). Converts file to WebP and stores in database.
+```json
+{
+  "name": "Aditi Sharma",
+  "displayName": "Aditi S.",
+  "email": "aditi@example.com",
+  "bio": "Curating entry-level roles"
+}
+```
+
+- **Response**: `201 Created` with created user details and temporary password.
+
+### PATCH /api/admin/users/[id]
+
+- **Description**: Toggles contributor active status or updates profile. When setting `isActive: false`, increments `tokenVersion` to immediately revoke all active JWT sessions.
+- **Authentication**: Admin only.
+- **Request Body**:
+
+```json
+{
+  "isActive": false
+}
+```
+
+### DELETE /api/admin/users/[id]
+
+- **Description**: Deletes a user account. Admins cannot delete their own account.
+- **Authentication**: Admin only.
