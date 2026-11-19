@@ -6,10 +6,14 @@
 import { NextResponse } from 'next/server';
 import { clearSessionCookie, getSessionUser } from '@/lib/auth';
 import { recordAuditLog } from '@/lib/audit';
+import { assertSameOrigin } from '@/lib/security';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   const user = await getSessionUser(request);
 
   if (user) {

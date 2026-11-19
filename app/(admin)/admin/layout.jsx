@@ -50,6 +50,12 @@ export default async function AdminLayout({ children }) {
               >
                 Guides
               </Link>
+              <Link
+                href="/admin/profile"
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              >
+                Profile
+              </Link>
               {isAdmin && (
                 <>
                   <Link
@@ -63,6 +69,12 @@ export default async function AdminLayout({ children }) {
                     className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                   >
                     Reports
+                  </Link>
+                  <Link
+                    href="/admin/audit"
+                    className="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  >
+                    Audit
                   </Link>
                 </>
               )}

@@ -7,7 +7,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Job from '@/models/Job';
-import { sanitizeNoSql } from '@/lib/security';
+import { sanitizeNoSql, assertSameOrigin } from '@/lib/security';
 
 /**
  * Resolves job listings for locally bookmarked IDs.
@@ -16,6 +16,9 @@ import { sanitizeNoSql } from '@/lib/security';
  * @returns {Promise<NextResponse>}
  */
 export async function POST(request) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   try {
     const rawBody = await request.json().catch(() => null);
     if (!rawBody || !Array.isArray(rawBody.ids)) {

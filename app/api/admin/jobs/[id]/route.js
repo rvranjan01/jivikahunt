@@ -5,10 +5,11 @@
  */
 
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
 import { requireAuth } from '@/lib/auth';
 import { jobSchema } from '@/lib/validation';
-import { sanitizeNoSql, getClientIp, hashIp } from '@/lib/security';
+import { sanitizeNoSql, getClientIp, hashIp, assertSameOrigin } from '@/lib/security';
 import { generateUniqueJobSlug, generateCompanySlug } from '@/lib/slug';
 import { postJobToTelegram } from '@/lib/telegram';
 import { recordAuditLog } from '@/lib/audit';
@@ -61,6 +62,9 @@ export async function GET(request, context) {
  * PUT: Updates an existing job posting.
  */
 export async function PUT(request, context) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   const auth = await requireAuth(request);
   if ('errorResponse' in auth) {
     return auth.errorResponse;
@@ -158,6 +162,21 @@ export async function PUT(request, context) {
       ipHash: ipHashed,
     });
 
+    try {
+      revalidatePath('/');
+      revalidatePath('/jobs');
+      revalidatePath('/sitemap.xml');
+      revalidatePath(`/jobs/${updated.slug}`);
+      if (slug && slug !== updated.slug) {
+        revalidatePath(`/jobs/${slug}`);
+      }
+      if (updated.company?.slug) {
+        revalidatePath(`/companies/${updated.company.slug}`);
+      }
+    } catch {
+      // Gracefully ignored when outside active Next.js rendering context
+    }
+
     return NextResponse.json({
       success: true,
       job: {
@@ -177,6 +196,9 @@ export async function PUT(request, context) {
  * DELETE: Deletes or unpublishes a job posting.
  */
 export async function DELETE(request, context) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   const auth = await requireAuth(request);
   if ('errorResponse' in auth) {
     return auth.errorResponse;
@@ -218,6 +240,18 @@ export async function DELETE(request, context) {
       metadata: { title: existingJob.title, company: existingJob.company?.name },
       ipHash: ipHashed,
     });
+
+    try {
+      revalidatePath('/');
+      revalidatePath('/jobs');
+      revalidatePath('/sitemap.xml');
+      revalidatePath(`/jobs/${existingJob.slug}`);
+      if (existingJob.company?.slug) {
+        revalidatePath(`/companies/${existingJob.company.slug}`);
+      }
+    } catch {
+      // Gracefully ignored when outside active Next.js rendering context
+    }
 
     return NextResponse.json({ success: true, message: 'Job deleted successfully.' });
   } catch (err) {

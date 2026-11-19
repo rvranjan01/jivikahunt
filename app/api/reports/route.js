@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Job from '@/models/Job';
 import Report from '@/models/Report';
-import { getClientIp, hashIp, sanitizeNoSql } from '@/lib/security';
+import { getClientIp, hashIp, sanitizeNoSql, assertSameOrigin } from '@/lib/security';
 import { checkReportRateLimit, recordReportSubmission } from '@/lib/rateLimit';
 import { createReportSchema } from '@/lib/validation';
 import { recordAuditLog } from '@/lib/audit';
@@ -20,6 +20,9 @@ import { recordAuditLog } from '@/lib/audit';
  * @returns {Promise<NextResponse>}
  */
 export async function POST(request) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   try {
     const clientIp = getClientIp(request);
     const ipHash = hashIp(clientIp);

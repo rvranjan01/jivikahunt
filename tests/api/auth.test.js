@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { POST as loginHandler } from '@/app/api/auth/login/route';
 import { POST as logoutHandler } from '@/app/api/auth/logout/route';
 import { POST as changePasswordHandler } from '@/app/api/auth/change-password/route';
@@ -106,6 +106,10 @@ describe('Authentication API Handlers', () => {
     mockUsers = [contributorUser, adminUser];
   });
 
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   describe('POST /api/auth/login', () => {
     it('should reject invalid credentials with generic error', async () => {
       const req = new Request('http://localhost:3000/api/auth/login', {
@@ -165,6 +169,8 @@ describe('Authentication API Handlers', () => {
     });
 
     it('should require TOTP 2FA for admin accounts without 2FA code', async () => {
+      vi.stubEnv('ADMIN_2FA_REQUIRED', 'true');
+
       const req = new Request('http://localhost:3000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -181,6 +187,8 @@ describe('Authentication API Handlers', () => {
     });
 
     it('should reject admin login with invalid 2FA code', async () => {
+      vi.stubEnv('ADMIN_2FA_REQUIRED', 'true');
+
       const req = new Request('http://localhost:3000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -198,6 +206,7 @@ describe('Authentication API Handlers', () => {
     });
 
     it('should authenticate admin when valid password and valid TOTP code provided', async () => {
+      vi.stubEnv('ADMIN_2FA_REQUIRED', 'true');
       const validTotp = generateSync({ secret: adminTotpSecret });
 
       const req = new Request('http://localhost:3000/api/auth/login', {
@@ -221,6 +230,48 @@ describe('Authentication API Handlers', () => {
       const cookieHeader = res.headers.get('set-cookie');
       expect(cookieHeader).toContain('jh_session=');
       expect(cookieHeader).toContain('HttpOnly');
+    });
+
+    it('should authenticate admin with password only when ADMIN_2FA_REQUIRED is false', async () => {
+      vi.stubEnv('ADMIN_2FA_REQUIRED', 'false');
+
+      const req = new Request('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'admin@jivikahunt.com',
+          password: 'AdminPass123!',
+        }),
+      });
+
+      const res = await loginHandler(req);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.success).toBe(true);
+      expect(data.requires2FA).toBeUndefined();
+      expect(data.user.email).toBe('admin@jivikahunt.com');
+      expect(data.user.role).toBe('admin');
+    });
+
+    it('should return clear message when 2FA is required but admin has no totpSecret', async () => {
+      vi.stubEnv('ADMIN_2FA_REQUIRED', 'true');
+      adminUser.totpSecret = null;
+
+      const req = new Request('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'admin@jivikahunt.com',
+          password: 'AdminPass123!',
+        }),
+      });
+
+      const res = await loginHandler(req);
+      expect(res.status).toBe(400);
+      const data = await res.json();
+      expect(data.error).toBe(
+        '2FA is not set up. Run: node --env-file=.env scripts/enable-2fa.js admin@jivikahunt.com'
+      );
     });
   });
 

@@ -12,7 +12,7 @@ import { formatIST } from '@/lib/time';
 import { generateJobPostingJsonLd } from '@/lib/jsonLd';
 import siteConfig from '@/lib/siteConfig';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 /**
  * Dynamic metadata generator with canonical URLs, Open Graph, Twitter cards, and expired job noindex enforcement.

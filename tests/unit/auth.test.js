@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import {
   hashPassword,
   verifyPassword,
@@ -8,6 +8,10 @@ import {
 } from '@/lib/auth';
 
 describe('Auth Utilities (lib/auth.js)', () => {
+  beforeAll(() => {
+    process.env.JWT_SECRET =
+      process.env.JWT_SECRET || 'test_jwt_secret_at_least_32_chars_long_12345';
+  });
   describe('Password Hashing', () => {
     it('should hash and correctly verify passwords', async () => {
       const password = 'SuperSecret123!';

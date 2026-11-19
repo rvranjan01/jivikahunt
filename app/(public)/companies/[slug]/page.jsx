@@ -7,7 +7,7 @@ import Pagination from '@/components/Pagination';
 import AdSlot from '@/components/AdSlot';
 import siteConfig from '@/lib/siteConfig';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 /**
  * Metadata generator for individual company landing pages.

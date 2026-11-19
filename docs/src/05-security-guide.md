@@ -45,30 +45,56 @@ Security is built into every layer of JivikaHunt. We follow the principle of lea
 - Tracked simultaneously by client IP address and email using dual-key rate limiting (`ip:<ip>` and `email:<email>`).
 - Accounts are temporarily locked for 15 minutes after 5 consecutive failed attempts (HTTP 429).
 
-## 3. Production Security Headers & CSP (Phase 7)
+### Password Security & Hashing
+
+- Password hashing is handled by `bcryptjs` in `lib/password.js` using **12 salt rounds** (computationally hardened for modern hardware).
+- Random temporary contributor passwords (14 characters, high entropy) are generated using `crypto.randomBytes()`.
+- Users must update temporary passwords on initial login (`mustChangePassword: true`).
+
+### Same-Origin Mutation Defense (`assertSameOrigin`)
+
+- All state-mutating route handlers (`POST`, `PATCH`, `PUT`, `DELETE`) invoke `assertSameOrigin(request)` as their very first guard.
+- Compares the client `Origin` header against the canonical `NEXT_PUBLIC_SITE_URL` host.
+- Missing `Origin` headers are permitted solely for safe, idempotent read-only requests (`GET` and `HEAD`); mutating requests without an `Origin` header or from a mismatched origin are rejected immediately with HTTP 403 Forbidden.
+- Replaces brittle CSRF tokens with browser-native Origin verification without breaking stateless APIs.
+
+### Trusted Client IP Resolution (`getClientIp`)
+
+- To prevent spoofing and rate-limiting bypass attacks, `cf-connecting-ip` and client-supplied `x-forwarded-for` prefixes are intentionally untrusted.
+- In Heroku's trusted reverse proxy architecture, Heroku appends the verified client IP as the **last** entry in the `x-forwarded-for` header list.
+- `getClientIp()` in `lib/security.js` extracts this trailing value, preventing attackers from injecting arbitrary IP headers.
+- Client IPs are salted and hashed using SHA-256 (`hashIp`) prior to persistence in `Report` and `LoginAttempt` collections to guarantee privacy compliance.
+
+### HTML Email Template Sanitization (`escapeHtml`)
+
+- All interpolated values (e.g. contributor names, job titles, URLs) passed into transactional email templates (`lib/email.js`) are sanitized via `escapeHtml()`.
+- Neutralizes HTML and script injection vulnerabilities across all mail clients.
+
+## 3. Production Security Headers & CSP
 
 Configured globally in `next.config.mjs` applied to all outgoing HTTP responses:
 
-- **Strict-Transport-Security (HSTS)**: `max-age=63072000; includeSubDomains; preload` enforces HTTPS exclusively.
+- **Strict-Transport-Security (HSTS)**: `max-age=63072000; includeSubDomains` enforces HTTPS exclusively across all subdomains. The `preload` directive is intentionally omitted until the production domain is formally verified and enrolled at `hstspreload.org`.
 - **X-Content-Type-Options**: `nosniff` prevents MIME type sniffing attacks.
 - **X-Frame-Options**: `SAMEORIGIN` mitigates clickjacking.
 - **Referrer-Policy**: `strict-origin-when-cross-origin` protects user referral paths.
-- **Permissions-Policy**: `camera=(), microphone=(), geolocation=(), browsing-topics=()` disables high-risk browser capabilities.
+- **Permissions-Policy**: `camera=(), microphone=(), geolocation=()` disables high-risk browser capabilities.
 
 ### Content Security Policy (CSP)
 
 Restricts external script execution, connections, and frame embeds:
 
 - `default-src 'self'`
-- `script-src 'self' 'unsafe-eval' 'unsafe-inline' https://pagead2.googlesyndication.com https://cdn.onesignal.com https://www.googletagmanager.com`
+- `script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://cdn.onesignal.com https://*.google.com https://*.googletagmanager.com` (`'unsafe-eval'` has been completely removed for production hardening; `'unsafe-inline'` is retained temporarily pending CSP nonce support in Next.js Turbopack)
 - `style-src 'self' 'unsafe-inline'`
 - `img-src 'self' data: blob: https:`
 - `font-src 'self' data:`
-- `connect-src 'self' https://onesignal.com https://www.google-analytics.com`
-- `frame-src 'self' https://googleads.g.doubleclick.net`
+- `connect-src 'self' https://pagead2.googlesyndication.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://onesignal.com https://*.onesignal.com`
+- `frame-src 'self' https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://tpc.googlesyndication.com`
 - `object-src 'none'`
 - `base-uri 'self'`
 - `form-action 'self'`
+- `frame-ancestors 'self'`
 
 ## 4. Privacy & Cookie Consent Gating (Phase 7)
 

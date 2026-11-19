@@ -9,7 +9,7 @@ import connectDB from '@/lib/db';
 import Report from '@/models/Report';
 import { requireAdmin } from '@/lib/auth';
 import { updateReportSchema } from '@/lib/validation';
-import { sanitizeNoSql, getClientIp, hashIp } from '@/lib/security';
+import { sanitizeNoSql, getClientIp, hashIp, assertSameOrigin } from '@/lib/security';
 import { recordAuditLog } from '@/lib/audit';
 
 /**
@@ -21,6 +21,9 @@ import { recordAuditLog } from '@/lib/audit';
  * @returns {Promise<NextResponse>}
  */
 export async function PATCH(request, context) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   try {
     const auth = await requireAdmin(request);
     if ('errorResponse' in auth) {

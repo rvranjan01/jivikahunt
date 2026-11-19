@@ -8,11 +8,14 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Subscriber from '@/models/Subscriber';
 import { subscribeSchema } from '@/lib/validation';
-import { sanitizeNoSql, getClientIp, hashIp } from '@/lib/security';
+import { sanitizeNoSql, getClientIp, hashIp, assertSameOrigin } from '@/lib/security';
 import { sendSubscriptionConfirmationEmail } from '@/lib/email';
 import { recordAuditLog } from '@/lib/audit';
 
 export async function POST(request) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   try {
     const rawBody = await request.json().catch(() => null);
     if (!rawBody) {

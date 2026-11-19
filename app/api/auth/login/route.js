@@ -11,12 +11,15 @@ import { loginSchema } from '@/lib/validation';
 import { verifyPassword, createSessionToken, setSessionCookie } from '@/lib/auth';
 import { verifyTotpToken } from '@/lib/totp';
 import { checkLoginRateLimit, recordFailedLogin, clearLoginRateLimit } from '@/lib/rateLimit';
-import { getClientIp, hashIp, sanitizeNoSql } from '@/lib/security';
+import { getClientIp, hashIp, sanitizeNoSql, assertSameOrigin } from '@/lib/security';
 import { recordAuditLog } from '@/lib/audit';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   const ip = getClientIp(request);
   const ipHashed = hashIp(ip);
 
@@ -96,13 +99,16 @@ export async function POST(request) {
     }
 
     // 4. Admin 2FA Verification
-    if (user.role === 'admin') {
+    const is2FaRequired = process.env.ADMIN_2FA_REQUIRED !== 'false';
+
+    if (user.role === 'admin' && is2FaRequired) {
       if (!user.totpSecret) {
         // Uninitialized admin TOTP configuration
-        console.error(`Admin user ${user.email} does not have a totpSecret configured.`);
         return NextResponse.json(
-          { error: 'Admin 2FA is not configured. Please run seed script or contact support.' },
-          { status: 500 }
+          {
+            error: `2FA is not set up. Run: node --env-file=.env scripts/enable-2fa.js ${user.email}`,
+          },
+          { status: 400 }
         );
       }
 

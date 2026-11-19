@@ -14,7 +14,7 @@ const nextConfig = {
           },
           {
             key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
+            value: 'max-age=63072000; includeSubDomains',
           },
           {
             key: 'X-Frame-Options',
@@ -34,9 +34,10 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
+            // TODO: replace 'unsafe-inline' with CSP nonces once supported cleanly in Turbopack
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://*.google.com https://*.googletagmanager.com https://cdn.onesignal.com https://onesignal.com",
+              "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://*.google.com https://*.googletagmanager.com https://cdn.onesignal.com https://onesignal.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",

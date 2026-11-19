@@ -6,9 +6,10 @@
  */
 
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/auth';
 import { jobSchema } from '@/lib/validation';
-import { sanitizeNoSql, getClientIp, hashIp } from '@/lib/security';
+import { sanitizeNoSql, getClientIp, hashIp, assertSameOrigin } from '@/lib/security';
 import { generateUniqueJobSlug, generateCompanySlug } from '@/lib/slug';
 import { checkContributorDailyQuota } from '@/lib/quota';
 import { postJobToTelegram } from '@/lib/telegram';
@@ -50,9 +51,11 @@ export async function GET(request) {
   }
 
   if (search) {
+    // Escape regex metacharacters to prevent ReDoS from user-supplied search text
+    const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     query.$or = [
-      { title: { $regex: search, $options: 'i' } },
-      { 'company.name': { $regex: search, $options: 'i' } },
+      { title: { $regex: escapedSearch, $options: 'i' } },
+      { 'company.name': { $regex: escapedSearch, $options: 'i' } },
     ];
   }
 
@@ -85,6 +88,9 @@ export async function GET(request) {
  * POST: Creates and publishes a job listing.
  */
 export async function POST(request) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   const auth = await requireAuth(request);
   if ('errorResponse' in auth) {
     return auth.errorResponse;
@@ -193,6 +199,18 @@ export async function POST(request) {
       metadata: { title: newJob.title, company: newJob.company.name, status: newJob.status },
       ipHash: ipHashed,
     });
+
+    try {
+      revalidatePath('/');
+      revalidatePath('/jobs');
+      revalidatePath('/sitemap.xml');
+      revalidatePath(`/jobs/${newJob.slug}`);
+      if (newJob.company?.slug) {
+        revalidatePath(`/companies/${newJob.company.slug}`);
+      }
+    } catch {
+      // Gracefully ignored when executed outside of an active Next.js rendering context
+    }
 
     return NextResponse.json(
       {

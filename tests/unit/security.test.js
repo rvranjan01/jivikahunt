@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { sanitizeNoSql, hashIp, getClientIp } from '@/lib/security';
+import { describe, it, expect, vi } from 'vitest';
+import { sanitizeNoSql, hashIp, getClientIp, assertSameOrigin } from '@/lib/security';
 
 describe('Security Utilities (lib/security.js)', () => {
   describe('sanitizeNoSql', () => {
@@ -58,23 +58,87 @@ describe('Security Utilities (lib/security.js)', () => {
   });
 
   describe('getClientIp', () => {
-    it('should prefer cf-connecting-ip if present', () => {
+    it('should use the last x-forwarded-for entry added by trusted proxy and ignore cf-connecting-ip', () => {
       const req = {
         headers: new Headers({
           'cf-connecting-ip': '1.1.1.1',
-          'x-forwarded-for': '2.2.2.2, 3.3.3.3',
+          'x-forwarded-for': 'spoofed.ip.1, 203.0.113.50',
         }),
       };
-      expect(getClientIp(req)).toBe('1.1.1.1');
+      expect(getClientIp(req)).toBe('203.0.113.50');
     });
 
-    it('should use first x-forwarded-for entry if cf-connecting-ip is absent', () => {
+    it('should handle single x-forwarded-for entry', () => {
       const req = {
         headers: new Headers({
-          'x-forwarded-for': '198.51.100.5, 10.0.0.1',
+          'x-forwarded-for': '198.51.100.5',
         }),
       };
       expect(getClientIp(req)).toBe('198.51.100.5');
+    });
+
+    it('should fall back to x-real-ip if x-forwarded-for is absent', () => {
+      const req = {
+        headers: new Headers({
+          'x-real-ip': '192.0.2.1',
+        }),
+      };
+      expect(getClientIp(req)).toBe('192.0.2.1');
+    });
+
+    it('should default to 127.0.0.1 when no IP headers exist', () => {
+      const req = {
+        headers: new Headers(),
+      };
+      expect(getClientIp(req)).toBe('127.0.0.1');
+    });
+  });
+
+  describe('assertSameOrigin', () => {
+    const siteUrl = 'https://jivikahunt.com';
+
+    it('should allow GET and HEAD requests without Origin header', () => {
+      vi.stubEnv('NEXT_PUBLIC_SITE_URL', siteUrl);
+      const getReq = new Request('https://jivikahunt.com/api/jobs', { method: 'GET' });
+      const headReq = new Request('https://jivikahunt.com/api/jobs', { method: 'HEAD' });
+
+      expect(assertSameOrigin(getReq)).toBeNull();
+      expect(assertSameOrigin(headReq)).toBeNull();
+    });
+
+    it('should reject POST/PATCH/DELETE without Origin header', async () => {
+      vi.stubEnv('NEXT_PUBLIC_SITE_URL', siteUrl);
+      const postReq = new Request('https://jivikahunt.com/api/jobs', { method: 'POST' });
+      const res = assertSameOrigin(postReq);
+
+      expect(res).not.toBeNull();
+      expect(res.status).toBe(403);
+      const data = await res.json();
+      expect(data.error).toMatch(/Missing Origin/i);
+    });
+
+    it('should allow matching Origin on mutating requests', () => {
+      vi.stubEnv('NEXT_PUBLIC_SITE_URL', siteUrl);
+      const postReq = new Request('https://jivikahunt.com/api/jobs', {
+        method: 'POST',
+        headers: { Origin: 'https://jivikahunt.com' },
+      });
+
+      expect(assertSameOrigin(postReq)).toBeNull();
+    });
+
+    it('should reject mismatched Origin host', async () => {
+      vi.stubEnv('NEXT_PUBLIC_SITE_URL', siteUrl);
+      const postReq = new Request('https://jivikahunt.com/api/jobs', {
+        method: 'POST',
+        headers: { Origin: 'https://evil-attacker.com' },
+      });
+
+      const res = assertSameOrigin(postReq);
+      expect(res).not.toBeNull();
+      expect(res.status).toBe(403);
+      const data = await res.json();
+      expect(data.error).toMatch(/Cross-origin/i);
     });
   });
 });

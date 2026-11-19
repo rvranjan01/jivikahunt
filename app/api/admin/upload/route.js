@@ -10,11 +10,15 @@ import { requireAuth } from '@/lib/auth';
 import { processImageUpload, MAX_IMAGE_SIZE_BYTES } from '@/lib/image';
 import { connectToDatabase } from '@/lib/db';
 import { recordAuditLog } from '@/lib/audit';
+import { assertSameOrigin } from '@/lib/security';
 import Image from '@/models/Image';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   const auth = await requireAuth(request);
   if ('errorResponse' in auth) {
     return auth.errorResponse;

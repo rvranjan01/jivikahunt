@@ -4,6 +4,23 @@ All notable changes to the JivikaHunt project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-11-19
+
+### Added
+
+- **Security Hardening, Origin Enforcement & Incremental Static Regeneration (ISR)**:
+  - Added strict Same-Origin enforcement (`assertSameOrigin`) across all mutating API routes (`POST`, `PATCH`, `PUT`, `DELETE`), rejecting cross-origin submissions and missing Origin headers with HTTP 403.
+  - Hardened client IP extraction (`getClientIp`) to extract the trusted Heroku proxy's trailing `x-forwarded-for` entry, actively ignoring client-spoofed `cf-connecting-ip` headers.
+  - Added HTML escaping (`escapeHtml`) across all transactional email templates (`sendContributorInviteEmail`, `sendSubscriptionConfirmationEmail`, `sendDailyDigestEmail`) to prevent email HTML injection.
+  - Sanitized search regex characters in admin job queries to mitigate ReDoS vulnerabilities.
+  - Hardened bcrypt password hashing to 12 work factor rounds in `lib/password.js`.
+  - Removed `'unsafe-eval'` from CSP `script-src` and stripped `preload` from HSTS in `next.config.mjs`.
+  - Added database name safety assertion in Playwright E2E global setup (`MONGODB_URI` must end with `_test`).
+  - Switched public pages (`/jobs/[slug]`, `/companies/[slug]`, `/guides`, `/guides/[slug]`) to Incremental Static Regeneration with `revalidate = 300`.
+  - Configured home page (`/`) with `revalidate = 120` while dynamically serving filtered search queries.
+  - Integrated on-demand cache revalidation via `revalidatePath` on job and guide mutations across admin endpoints.
+  - Added non-production startup warning for placeholder social and contact URLs in `lib/siteConfig.js`.
+
 ## [0.8.0] - 2026-11-19
 
 ### Added

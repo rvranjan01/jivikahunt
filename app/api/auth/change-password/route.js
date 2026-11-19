@@ -13,13 +13,16 @@ import {
   setSessionCookie,
 } from '@/lib/auth';
 import { changePasswordSchema } from '@/lib/validation';
-import { sanitizeNoSql, getClientIp, hashIp } from '@/lib/security';
+import { sanitizeNoSql, getClientIp, hashIp, assertSameOrigin } from '@/lib/security';
 import { recordAuditLog } from '@/lib/audit';
 import User from '@/models/User';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   const auth = await requireAuth(request);
   if ('errorResponse' in auth) {
     return auth.errorResponse;

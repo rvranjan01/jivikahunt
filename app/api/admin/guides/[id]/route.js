@@ -5,12 +5,13 @@
  */
 
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import connectDB from '@/lib/db';
 import Guide from '@/models/Guide';
 import { requireAuth } from '@/lib/auth';
 import { guideSchema } from '@/lib/validation';
 import { generateUniqueGuideSlug } from '@/lib/slug';
-import { sanitizeNoSql, getClientIp, hashIp } from '@/lib/security';
+import { sanitizeNoSql, getClientIp, hashIp, assertSameOrigin } from '@/lib/security';
 import { recordAuditLog } from '@/lib/audit';
 
 export async function GET(request, context) {
@@ -43,6 +44,9 @@ export async function GET(request, context) {
 }
 
 export async function PUT(request, context) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   try {
     const auth = await requireAuth(request);
     if ('errorResponse' in auth) return auth.errorResponse;
@@ -108,6 +112,14 @@ export async function PUT(request, context) {
       ipHash,
     });
 
+    try {
+      revalidatePath('/guides');
+      revalidatePath('/sitemap.xml');
+      revalidatePath(`/guides/${guide.slug}`);
+    } catch {
+      // Gracefully ignored when outside active Next.js rendering context
+    }
+
     return NextResponse.json({ success: true, guide });
   } catch (err) {
     console.error('Update guide error:', err);
@@ -116,6 +128,9 @@ export async function PUT(request, context) {
 }
 
 export async function DELETE(request, context) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   try {
     const auth = await requireAuth(request);
     if ('errorResponse' in auth) return auth.errorResponse;
@@ -151,6 +166,14 @@ export async function DELETE(request, context) {
       metadata: { title: guide.title, slug: guide.slug },
       ipHash,
     });
+
+    try {
+      revalidatePath('/guides');
+      revalidatePath('/sitemap.xml');
+      revalidatePath(`/guides/${guide.slug}`);
+    } catch {
+      // Gracefully ignored when outside active Next.js rendering context
+    }
 
     return NextResponse.json({ success: true, message: 'Guide deleted successfully' });
   } catch (err) {

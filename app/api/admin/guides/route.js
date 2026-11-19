@@ -5,12 +5,13 @@
  */
 
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import connectDB from '@/lib/db';
 import Guide from '@/models/Guide';
 import { requireAuth } from '@/lib/auth';
 import { guideSchema } from '@/lib/validation';
 import { generateUniqueGuideSlug } from '@/lib/slug';
-import { sanitizeNoSql, getClientIp, hashIp } from '@/lib/security';
+import { sanitizeNoSql, getClientIp, hashIp, assertSameOrigin } from '@/lib/security';
 import { recordAuditLog } from '@/lib/audit';
 
 export async function GET(request) {
@@ -36,6 +37,9 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   try {
     const auth = await requireAuth(request);
     if ('errorResponse' in auth) return auth.errorResponse;
@@ -87,6 +91,14 @@ export async function POST(request) {
       metadata: { title, slug, status },
       ipHash,
     });
+
+    try {
+      revalidatePath('/guides');
+      revalidatePath('/sitemap.xml');
+      revalidatePath(`/guides/${guide.slug}`);
+    } catch {
+      // Gracefully ignored when outside active Next.js rendering context
+    }
 
     return NextResponse.json({ success: true, guide }, { status: 201 });
   } catch (err) {

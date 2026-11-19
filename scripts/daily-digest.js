@@ -13,6 +13,11 @@ import Job from '../models/Job.js';
 import { sendDailyDigestEmail } from '../lib/email.js';
 import { isJobExpired } from '../lib/time.js';
 
+if (process.argv.includes('--dry-run')) {
+  console.info('Dry run: scripts/daily-digest.js loaded successfully. Skipping DB operations.');
+  process.exit(0);
+}
+
 async function runDailyDigest() {
   console.info('--- Starting JivikaHunt Daily Digest Script ---');
   await connectDB();

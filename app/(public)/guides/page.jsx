@@ -4,7 +4,7 @@ import Guide from '@/models/Guide';
 import { formatIST } from '@/lib/time';
 import siteConfig from '@/lib/siteConfig';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export const metadata = {
   title: 'Career & Placement Guides for Freshers',

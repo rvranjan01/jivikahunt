@@ -12,6 +12,11 @@ import Job from '../models/Job.js';
 import { postJobToTelegram } from '../lib/telegram.js';
 import { recordAuditLog } from '../lib/audit.js';
 
+if (process.argv.includes('--dry-run')) {
+  console.info('Dry run: scripts/publish-scheduled.js loaded successfully. Skipping DB operations.');
+  process.exit(0);
+}
+
 async function publishScheduledJobs() {
   console.info('--- Checking for Scheduled Jobs Ready to Publish ---');
   await connectDB();
@@ -31,6 +36,9 @@ async function publishScheduledJobs() {
     job.status = 'published';
     job.createdAt = now; // Refresh publication timestamp
     await job.save();
+
+    // Note: revalidatePath is skipped here as standalone scripts run outside Next.js runtime;
+    // public listings rely on the 300-second ISR revalidation window.
 
     publishedCount += 1;
     console.info(`✓ Published: "${job.title}" at ${job.company?.name} (slug: ${job.slug})`);

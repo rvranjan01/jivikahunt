@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getPublicJobs, getPublicJobBySlug, getRelatedJobs } from '@/lib/publicJobs';
+import JobDetailPage, { revalidate, generateMetadata } from '@/app/(public)/jobs/[slug]/page';
 
 vi.mock('@/lib/db', () => ({
   default: vi.fn().mockResolvedValue(true),
@@ -217,5 +218,41 @@ describe('Public Jobs Data Access & Privacy (lib/publicJobs.js)', () => {
     expect(related).toBeDefined();
     // Should exclude current job itself
     expect(related.some((j) => j._id === currentJob._id)).toBe(false);
+  });
+
+  it('should export revalidate = 300 and set robots noindex for expired job metadata', async () => {
+    expect(revalidate).toBe(300);
+
+    // Active job metadata
+    const activeMeta = await generateMetadata({
+      params: Promise.resolve({ slug: 'junior-react-developer-at-techcorp' }),
+    });
+    expect(activeMeta.robots).toEqual({ index: true, follow: true });
+
+    // Expired job metadata: MUST have index: false
+    const expiredMeta = await generateMetadata({
+      params: Promise.resolve({ slug: 'backend-node-intern-at-acme' }),
+    });
+    expect(expiredMeta.robots).toEqual({ index: false, follow: true });
+  });
+
+  it('should render expired alert banner when accessing an expired job page', async () => {
+    // Expired job should show role="alert" banner
+    const expiredPage = await JobDetailPage({
+      params: Promise.resolve({ slug: 'backend-node-intern-at-acme' }),
+    });
+
+    expect(expiredPage).toBeDefined();
+    const expiredBanner = expiredPage.props.children[1];
+    expect(expiredBanner).toBeTruthy();
+    expect(expiredBanner.props.role).toBe('alert');
+    expect(expiredBanner.props.className).toContain('bg-rose-50');
+
+    // Active job should NOT show expired banner
+    const activePage = await JobDetailPage({
+      params: Promise.resolve({ slug: 'junior-react-developer-at-techcorp' }),
+    });
+    const activeBanner = activePage.props.children[1];
+    expect(activeBanner).toBeFalsy();
   });
 });

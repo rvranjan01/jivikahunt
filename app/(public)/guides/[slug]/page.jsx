@@ -8,7 +8,7 @@ import { renderMarkdown } from '@/lib/markdown';
 import { formatIST } from '@/lib/time';
 import siteConfig from '@/lib/siteConfig';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;

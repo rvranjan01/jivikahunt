@@ -7,7 +7,7 @@ import AdSlot from '@/components/AdSlot';
 import JobAlertsBanner from '@/components/JobAlertsBanner';
 import siteConfig from '@/lib/siteConfig';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 120;
 
 /**
  * Server-rendered Home Page displaying curated job listings with live URL-based filters.

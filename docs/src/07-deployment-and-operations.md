@@ -18,16 +18,49 @@ JivikaHunt is designed for cloud portability. The primary production deployment 
    ```
 2. Set Production Environment Variables:
    ```bash
+   # Core Database & Security
    heroku config:set MONGODB_URI="mongodb+srv://..."
-   heroku config:set JWT_SECRET="..."
-   heroku config:set HASH_SALT="..."
-   heroku config:set NEXT_PUBLIC_SITE_URL="https://jivikahunt.com"
+   heroku config:set JWT_SECRET="your_secure_32_char_jwt_secret_key"
+   heroku config:set HASH_SALT="your_secure_random_salt_for_ip_hashes"
    heroku config:set NODE_ENV="production"
+   heroku config:set ADMIN_2FA_REQUIRED="true"
+
+   # Site & Public Configuration
+   heroku config:set NEXT_PUBLIC_SITE_URL="https://jivikahunt.com"
+   heroku config:set NEXT_PUBLIC_ADSENSE_CLIENT_ID="ca-pub-XXXXXXXXXXXXXXXX"
+   heroku config:set NEXT_PUBLIC_ONESIGNAL_APP_ID="your_onesignal_app_id"
+   heroku config:set NEXT_PUBLIC_GA_ID="G-XXXXXXXXXX"
+   heroku config:set NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION="your_search_console_token"
+
+   # Email Service (Resend)
+   heroku config:set RESEND_API_KEY="re_xxxxxxxxxxxxxxxxx"
+   heroku config:set RESEND_FROM_EMAIL="JivikaHunt <alerts@jivikahunt.com>"
+
+   # Telegram Auto-Post Alerts
+   heroku config:set TELEGRAM_BOT_TOKEN="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
+   heroku config:set TELEGRAM_CHANNEL_ID="@jivikahunt"
    ```
 3. Deploy:
    ```bash
    git push heroku main
    ```
+
+### Heroku Scheduler Add-on & Automated Tasks
+
+Install the free Heroku Scheduler add-on to automate background processes:
+
+```bash
+heroku addons:create scheduler:standard
+```
+
+Open the scheduler dashboard (`heroku addons:open scheduler`) and configure two recurring jobs:
+
+| Task Name | Frequency | Command | Description |
+| :--- | :--- | :--- | :--- |
+| **Publish Scheduled Jobs** | Every 10 minutes | `node scripts/publish-scheduled.js` | Transitions scheduled vacancies whose publication timestamp has passed to published status. |
+| **Send Daily Email Digest** | Daily (02:30 UTC / 08:00 IST) | `node scripts/daily-digest.js` | Matches jobs published within the last 24 hours against confirmed subscriber preferences and sends personalized digests. |
+
+Note: Standalone background scripts run outside the Next.js runtime. Public ISR listings update automatically on their 300-second revalidation cycle.
 
 ### Cloudflare Integration
 

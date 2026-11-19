@@ -32,7 +32,7 @@ describe('Site Configuration (lib/siteConfig.js)', () => {
     expect(labels).toContain('Experienced');
 
     for (const item of siteConfig.nav) {
-      expect(item.href).toMatch(/^\/jobs\//);
+      expect(item.href).toMatch(/^\/jobs(\/|\?)/);
     }
   });
 

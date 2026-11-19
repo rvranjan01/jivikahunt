@@ -7,7 +7,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { updateContributorSchema } from '@/lib/validation';
-import { sanitizeNoSql, getClientIp, hashIp } from '@/lib/security';
+import { sanitizeNoSql, getClientIp, hashIp, assertSameOrigin } from '@/lib/security';
 import { recordAuditLog } from '@/lib/audit';
 import { connectToDatabase } from '@/lib/db';
 import User from '@/models/User';
@@ -19,6 +19,9 @@ export const dynamic = 'force-dynamic';
  * Crucially increments tokenVersion when deactivating to immediately invalidate active sessions.
  */
 export async function PATCH(request, context) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   const auth = await requireAdmin(request);
   if ('errorResponse' in auth) {
     return auth.errorResponse;
@@ -107,6 +110,9 @@ export async function PATCH(request, context) {
  * DELETE: Deletes a user account (Admin only).
  */
 export async function DELETE(request, context) {
+  const originError = assertSameOrigin(request);
+  if (originError) return originError;
+
   const auth = await requireAdmin(request);
   if ('errorResponse' in auth) {
     return auth.errorResponse;
