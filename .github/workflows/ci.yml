@@ -2,13 +2,27 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
+    branches: [main, master]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+
+    env:
+      MONGODB_URI: mongodb://localhost:27017/jivikahunt_test
+      JWT_SECRET: supersecretjwtkeythatisthirtytwocharacterslong1234
+      HASH_SALT: test_salted_hash_key_1234567890
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      ADMIN_TOTP_SECRET: G4MXQWRJH6PAN3TN324AAOWF4EPBYS7M
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,6 +47,17 @@ jobs:
 
       - name: Unit & API Tests
         run: npm run test
+
+      - name: Build Next.js Application
+        run: npm run build
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-End Tests (Playwright)
+        run: npm run test:e2e
+        env:
+          CI: true
 
       - name: Build documentation
         run: npm run docs:build

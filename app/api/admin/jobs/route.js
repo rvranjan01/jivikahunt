@@ -97,8 +97,9 @@ export async function POST(request) {
   try {
     const rawBody = await request.json();
     const sanitizedBody = sanitizeNoSql(rawBody);
+    const { force, ...jobPayload } = sanitizedBody;
 
-    const validationResult = jobSchema.safeParse(sanitizedBody);
+    const validationResult = jobSchema.safeParse(jobPayload);
     if (!validationResult.success) {
       return NextResponse.json(
         { error: 'Invalid job data', details: validationResult.error.format() },
@@ -124,7 +125,8 @@ export async function POST(request) {
     await connectToDatabase();
 
     // 2. Duplicate Check: Warn if the same company, title, and apply link already exist
-    const isDuplicateAllowed = rawBody.force === true;
+    const isDuplicateAllowed = force === true;
+
     const existingDuplicate = await Job.findOne({
       'company.name': { $regex: `^${jobData.company.name.trim()}$`, $options: 'i' },
       title: { $regex: `^${jobData.title.trim()}$`, $options: 'i' },

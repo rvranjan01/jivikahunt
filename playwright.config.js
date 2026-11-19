@@ -1,7 +1,16 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// Load local environment variables into test runners
+try {
+  process.loadEnvFile?.('.env.local');
+} catch {}
+try {
+  process.loadEnvFile?.('.env');
+} catch {}
+
 export default defineConfig({
   testDir: './tests/e2e',
+  globalSetup: './tests/e2e/global-setup.js',
   timeout: 30000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -15,11 +24,17 @@ export default defineConfig({
   projects: [
     {
       name: 'Desktop Chrome',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: process.env.CI ? undefined : 'chrome',
+      },
     },
     {
       name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
+      use: {
+        ...devices['Pixel 5'],
+        channel: process.env.CI ? undefined : 'chrome',
+      },
     },
   ],
   webServer: {

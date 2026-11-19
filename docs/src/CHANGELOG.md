@@ -4,6 +4,25 @@ All notable changes to the JivikaHunt project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-11-19
+
+### Added
+
+- **Phase 7 End-to-End Testing (Playwright), Accessibility (axe), Security Headers, Cookie Consent Gating & CI Pipeline**:
+  - Full End-to-End Playwright test suite covering:
+    - Admin 2FA authentication flow with invalid password rejection, RFC 6238 TOTP verification via `otplib`, contributor invitation, and session establishment (`tests/e2e/auth-admin.spec.js`).
+    - Contributor job authoring workflow using ChatGPT extraction prompt assistance and immediate publishing verification.
+    - Public user journey: search, multi-filter criteria (type, workMode, location), clean `nofollow noopener noreferrer` outbound links, author box contributor privacy verification (zero email leakage), modal-based broken link reporting with IP rate limit handling, and client-side saved jobs bookmarks (`tests/e2e/public-site.spec.js`).
+    - Expired vacancy behavior: notice banner display and `<meta name="robots" content="noindex" />` verification.
+  - Automated WCAG 2.1 AA accessibility auditing via `@axe-core/playwright` across 5 key routes (`/`, `/jobs`, `/guides`, `/jobs/[slug]`, `/admin/login`), verifying 0 critical accessibility violations (`tests/e2e/a11y-mobile.spec.js`).
+  - Mobile responsive drawer toggle verification on Pixel 5 viewport profile.
+  - Production security response headers configured in `next.config.mjs`: Strict-Transport-Security (HSTS), X-Content-Type-Options (nosniff), X-Frame-Options (SAMEORIGIN), Referrer-Policy, and Permissions-Policy.
+  - Strict Content Security Policy (CSP) whitelisting application resources and authorized external origins (Google AdSense, OneSignal, Google Analytics).
+  - Dynamic `/ads.txt` route handler (`app/ads.txt/route.js`) serving configured publisher IDs with edge cache headers.
+  - Cookie Consent Banner (`components/CookieConsent.jsx`) using React 19 `useSyncExternalStore` for flicker-free consent state management, gating Google Analytics, AdSense, and OneSignal scripts until explicit user opt-in.
+  - Refactored `AdSlot.jsx` with fixed `min-h-[280px]` CLS elimination and reactive consent synchronization.
+  - GitHub Actions CI workflow (`.github/workflows/ci.yml`) updated with automated linting, formatting check, security audit, unit/API tests, Next.js production build, Playwright browser setup, E2E test execution, and Word documentation rebuild.
+
 ## [0.7.0] - 2026-11-12
 
 ### Added

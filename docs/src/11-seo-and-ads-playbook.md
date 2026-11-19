@@ -38,6 +38,7 @@ AdSense monetization is configured strictly for high usability and full policy c
 
 ### Layout Stability & Consent
 
-- Containers use fixed minimum heights to eliminate Cumulative Layout Shift (CLS).
-- Ads are suppressed until the user gives consent on the Cookie Consent banner.
-- The `ads.txt` file is dynamically served from `/ads.txt` matching `siteConfig.ads.adsTxtContent`.
+- Containers use fixed minimum heights (`min-h-[280px]`) to eliminate Cumulative Layout Shift (CLS).
+- Ads are suppressed until the user gives consent on the Cookie Consent banner. The banner utilizes React 19 `useSyncExternalStore` and dispatches custom `jh_cookie_consent_updated` window events.
+- The `ads.txt` file is dynamically served from `/ads.txt` matching `siteConfig.ads.adsTxtContent` with `Cache-Control: public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800`.
+- Google Search Console ownership verification is supported through the `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` environment variable.

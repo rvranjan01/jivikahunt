@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import CookieConsent from '@/components/CookieConsent';
 
 /**
  * Public portal layout wrapping public routes with standard brand navigation and footer.
@@ -13,6 +14,7 @@ export default function PublicLayout({ children }) {
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <CookieConsent />
     </div>
   );
 }

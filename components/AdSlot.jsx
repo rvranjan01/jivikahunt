@@ -1,8 +1,35 @@
+'use client';
+
+import { useSyncExternalStore } from 'react';
 import siteConfig from '@/lib/siteConfig';
+
+function subscribeToConsent(callback) {
+  if (typeof window === 'undefined') return () => {};
+  window.addEventListener('jh_cookie_consent_updated', callback);
+  window.addEventListener('storage', callback);
+  return () => {
+    window.removeEventListener('jh_cookie_consent_updated', callback);
+    window.removeEventListener('storage', callback);
+  };
+}
+
+function getConsentSnapshot() {
+  if (typeof window === 'undefined') return false;
+  try {
+    return localStorage.getItem('jh_cookie_consent') === 'accepted';
+  } catch {
+    return false;
+  }
+}
+
+function getServerSnapshot() {
+  return false;
+}
 
 /**
  * Google AdSense banner placement wrapper.
  * Strictly enforces a fixed minimum height (min-h-[280px]) to prevent Cumulative Layout Shift (CLS).
+ * Gated by cookie consent: loads only after the user accepts cookies.
  * Renders nothing if ads are disabled or if NEXT_PUBLIC_ADSENSE_CLIENT_ID is unset.
  *
  * @param {Object} props
@@ -11,7 +38,13 @@ import siteConfig from '@/lib/siteConfig';
  * @param {string} [props.className='']
  */
 export default function AdSlot({ slotId, position = 'feed-inline', className = '' }) {
-  if (!siteConfig.ads.enabled) {
+  const hasConsent = useSyncExternalStore(
+    subscribeToConsent,
+    getConsentSnapshot,
+    getServerSnapshot
+  );
+
+  if (!siteConfig.ads.enabled || !hasConsent) {
     return null;
   }
 

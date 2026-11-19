@@ -22,11 +22,32 @@ JivikaHunt is designed for cloud portability. The primary production deployment 
    heroku config:set JWT_SECRET="..."
    heroku config:set HASH_SALT="..."
    heroku config:set NEXT_PUBLIC_SITE_URL="https://jivikahunt.com"
+   heroku config:set NODE_ENV="production"
    ```
 3. Deploy:
    ```bash
    git push heroku main
    ```
+
+### Cloudflare Integration
+
+Deploy Cloudflare in front of Heroku:
+
+- **SSL/TLS Mode**: Full (Strict).
+- **Edge Cache**: Configure Page Rule or Cache Rule for `https://jivikahunt.com/img/*` to Cache Everything with an Edge TTL of 1 year (`max-age=31536000`).
+- **Security**: Enable Always Use HTTPS, Automatic HTTPS Rewrites, and Cloudflare WAF managed rules.
+
+### Rollback Strategy:
+
+If a production deployment introduces critical defects:
+
+```bash
+# View recent releases
+heroku releases
+
+# Roll back to the previous stable release
+heroku releases:rollback v12
+```
 
 ## 3. Alternative VPS / Azure Deployment
 

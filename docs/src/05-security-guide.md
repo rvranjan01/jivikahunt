@@ -44,3 +44,34 @@ Security is built into every layer of JivikaHunt. We follow the principle of lea
 - Failed login attempts are recorded in a MongoDB TTL collection (`LoginAttempt`).
 - Tracked simultaneously by client IP address and email using dual-key rate limiting (`ip:<ip>` and `email:<email>`).
 - Accounts are temporarily locked for 15 minutes after 5 consecutive failed attempts (HTTP 429).
+
+## 3. Production Security Headers & CSP (Phase 7)
+
+Configured globally in `next.config.mjs` applied to all outgoing HTTP responses:
+
+- **Strict-Transport-Security (HSTS)**: `max-age=63072000; includeSubDomains; preload` enforces HTTPS exclusively.
+- **X-Content-Type-Options**: `nosniff` prevents MIME type sniffing attacks.
+- **X-Frame-Options**: `SAMEORIGIN` mitigates clickjacking.
+- **Referrer-Policy**: `strict-origin-when-cross-origin` protects user referral paths.
+- **Permissions-Policy**: `camera=(), microphone=(), geolocation=(), browsing-topics=()` disables high-risk browser capabilities.
+
+### Content Security Policy (CSP)
+
+Restricts external script execution, connections, and frame embeds:
+
+- `default-src 'self'`
+- `script-src 'self' 'unsafe-eval' 'unsafe-inline' https://pagead2.googlesyndication.com https://cdn.onesignal.com https://www.googletagmanager.com`
+- `style-src 'self' 'unsafe-inline'`
+- `img-src 'self' data: blob: https:`
+- `font-src 'self' data:`
+- `connect-src 'self' https://onesignal.com https://www.google-analytics.com`
+- `frame-src 'self' https://googleads.g.doubleclick.net`
+- `object-src 'none'`
+- `base-uri 'self'`
+- `form-action 'self'`
+
+## 4. Privacy & Cookie Consent Gating (Phase 7)
+
+- **Cookie Consent Banner (`CookieConsent.jsx`)**: Implemented using React 19 `useSyncExternalStore` for flicker-free external storage reactivity (`jh_cookie_consent`).
+- **Strict Third-Party Script Gating**: Google Analytics, Google AdSense, and OneSignal web push scripts remain completely unloaded until the user explicitly accepts cookies.
+- **Ad Slot Suppression (`AdSlot.jsx`)**: Advertising placeholders do not mount or call ad network scripts until consent state is verified as `accepted`.
