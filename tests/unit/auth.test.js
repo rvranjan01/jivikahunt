@@ -67,5 +67,25 @@ describe('Auth Utilities (lib/auth.js)', () => {
       expect(await verifySessionToken('')).toBeNull();
       expect(await verifySessionToken(null)).toBeNull();
     });
+
+    it('should throw in production if JWT_SECRET is shorter than 32 characters', async () => {
+      const origEnv = process.env.NODE_ENV;
+      const origSecret = process.env.JWT_SECRET;
+      try {
+        process.env.NODE_ENV = 'production';
+        process.env.JWT_SECRET = 'short_secret_under_32_chars';
+        await expect(
+          createSessionToken({
+            userId: '123',
+            email: 'test@example.com',
+            role: 'admin',
+            tokenVersion: 1,
+          })
+        ).rejects.toThrow(/at least 32 characters/);
+      } finally {
+        process.env.NODE_ENV = origEnv;
+        process.env.JWT_SECRET = origSecret;
+      }
+    });
   });
 });

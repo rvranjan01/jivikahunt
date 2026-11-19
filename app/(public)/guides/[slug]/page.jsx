@@ -12,9 +12,17 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  await connectDB();
+  let guide = null;
 
-  const guide = await Guide.findOne({ slug: slug.toLowerCase(), status: 'published' }).lean();
+  try {
+    await connectDB();
+    guide = await Guide.findOne({ slug: slug.toLowerCase(), status: 'published' }).lean();
+  } catch (err) {
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      return { title: 'Guide Not Found', robots: { index: false, follow: false } };
+    }
+    throw err;
+  }
 
   if (!guide) {
     return { title: 'Guide Not Found', robots: { index: false, follow: false } };
@@ -44,9 +52,27 @@ export async function generateMetadata({ params }) {
 
 export default async function GuideReaderPage({ params }) {
   const { slug } = await params;
-  await connectDB();
+  let guide = null;
 
-  const guide = await Guide.findOne({ slug: slug.toLowerCase(), status: 'published' }).lean();
+  try {
+    await connectDB();
+    guide = await Guide.findOne({ slug: slug.toLowerCase(), status: 'published' }).lean();
+  } catch (err) {
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      return (
+        <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-xs">
+            <h1 className="text-base font-bold text-slate-900">Guide Temporarily Unavailable</h1>
+            <p className="mt-1 text-xs text-slate-500">
+              Database connection was unavailable during build. Content will load dynamically on
+              demand.
+            </p>
+          </div>
+        </div>
+      );
+    }
+    throw err;
+  }
 
   if (!guide) {
     notFound();

@@ -16,9 +16,18 @@ export const metadata = {
 };
 
 export default async function GuidesHubPage() {
-  await connectDB();
+  let guides = [];
 
-  const guides = await Guide.find({ status: 'published' }).sort({ createdAt: -1 }).lean();
+  try {
+    await connectDB();
+    guides = await Guide.find({ status: 'published' }).sort({ createdAt: -1 }).lean();
+  } catch (err) {
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      guides = [];
+    } else {
+      throw err;
+    }
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

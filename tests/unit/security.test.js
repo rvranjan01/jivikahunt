@@ -58,7 +58,8 @@ describe('Security Utilities (lib/security.js)', () => {
   });
 
   describe('getClientIp', () => {
-    it('should use the last x-forwarded-for entry added by trusted proxy and ignore cf-connecting-ip', () => {
+    it('should use the last x-forwarded-for entry by default (TRUSTED_PROXY_HOPS=1)', () => {
+      vi.stubEnv('TRUSTED_PROXY_HOPS', '1');
       const req = {
         headers: new Headers({
           'cf-connecting-ip': '1.1.1.1',
@@ -68,7 +69,19 @@ describe('Security Utilities (lib/security.js)', () => {
       expect(getClientIp(req)).toBe('203.0.113.50');
     });
 
+    it('should select second-to-last entry when TRUSTED_PROXY_HOPS=2 (Cloudflare + Heroku)', () => {
+      vi.stubEnv('TRUSTED_PROXY_HOPS', '2');
+      // Format: client_ip, cloudflare_egress_ip
+      const req = {
+        headers: new Headers({
+          'x-forwarded-for': '203.0.113.195, 198.51.100.2',
+        }),
+      };
+      expect(getClientIp(req)).toBe('203.0.113.195');
+    });
+
     it('should handle single x-forwarded-for entry', () => {
+      vi.stubEnv('TRUSTED_PROXY_HOPS', '1');
       const req = {
         headers: new Headers({
           'x-forwarded-for': '198.51.100.5',

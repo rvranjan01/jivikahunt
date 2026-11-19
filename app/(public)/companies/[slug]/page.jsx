@@ -18,7 +18,19 @@ export const revalidate = 300;
  */
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const { jobs, total } = await getLandingPageJobs('company', slug, 1, 1);
+  let jobs = [];
+  let total = 0;
+
+  try {
+    const res = await getLandingPageJobs('company', slug, 1, 1);
+    jobs = res.jobs;
+    total = res.total;
+  } catch (err) {
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      return { title: 'Company Jobs', robots: { index: false, follow: false } };
+    }
+    throw err;
+  }
 
   if (total === 0 || jobs.length === 0) {
     return { title: 'Company Not Found', robots: { index: false, follow: false } };
@@ -55,7 +67,33 @@ export default async function CompanyLandingPage({ params, searchParams }) {
   const resolvedParams = await searchParams;
   const page = parseInt(String(resolvedParams?.page || '1'), 10) || 1;
 
-  const { jobs, total, totalPages } = await getLandingPageJobs('company', slug, page);
+  let jobs = [];
+  let total = 0;
+  let totalPages = 1;
+
+  try {
+    const res = await getLandingPageJobs('company', slug, page);
+    jobs = res.jobs;
+    total = res.total;
+    totalPages = res.totalPages;
+  } catch (err) {
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      return (
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-xs">
+            <h1 className="text-base font-bold text-slate-900">
+              Company Openings Temporarily Unavailable
+            </h1>
+            <p className="mt-1 text-xs text-slate-500">
+              Database connection was unavailable during build. Content will load dynamically on
+              demand.
+            </p>
+          </div>
+        </div>
+      );
+    }
+    throw err;
+  }
 
   if (total === 0 || jobs.length === 0) {
     notFound();

@@ -17,7 +17,21 @@ export const revalidate = 120;
  */
 export default async function HomePage({ searchParams }) {
   const resolvedParams = await searchParams;
-  const { jobs, pagination } = await getPublicJobs(resolvedParams);
+  let jobs = [];
+  let pagination = { page: 1, limit: 20, total: 0, totalPages: 1 };
+
+  try {
+    const res = await getPublicJobs(resolvedParams);
+    jobs = res.jobs;
+    pagination = res.pagination;
+  } catch (err) {
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      jobs = [];
+      pagination = { page: 1, limit: 20, total: 0, totalPages: 1 };
+    } else {
+      throw err;
+    }
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
