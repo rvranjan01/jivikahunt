@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GET as getProfileHandler, PATCH as updateProfileHandler } from '@/app/api/admin/profile/route';
+import {
+  GET as getProfileHandler,
+  PATCH as updateProfileHandler,
+} from '@/app/api/admin/profile/route';
 import { createSessionToken } from '@/lib/auth';
 
 vi.mock('@/lib/db', () => ({

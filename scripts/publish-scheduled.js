@@ -13,7 +13,9 @@ import { postJobToTelegram } from '../lib/telegram.js';
 import { recordAuditLog } from '../lib/audit.js';
 
 if (process.argv.includes('--dry-run')) {
-  console.info('Dry run: scripts/publish-scheduled.js loaded successfully. Skipping DB operations.');
+  console.info(
+    'Dry run: scripts/publish-scheduled.js loaded successfully. Skipping DB operations.'
+  );
   process.exit(0);
 }
 

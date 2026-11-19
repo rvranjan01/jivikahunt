@@ -55,10 +55,10 @@ heroku addons:create scheduler:standard
 
 Open the scheduler dashboard (`heroku addons:open scheduler`) and configure two recurring jobs:
 
-| Task Name | Frequency | Command | Description |
-| :--- | :--- | :--- | :--- |
-| **Publish Scheduled Jobs** | Every 10 minutes | `node scripts/publish-scheduled.js` | Transitions scheduled vacancies whose publication timestamp has passed to published status. |
-| **Send Daily Email Digest** | Daily (02:30 UTC / 08:00 IST) | `node scripts/daily-digest.js` | Matches jobs published within the last 24 hours against confirmed subscriber preferences and sends personalized digests. |
+| Task Name                   | Frequency                     | Command                             | Description                                                                                                              |
+| :-------------------------- | :---------------------------- | :---------------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
+| **Publish Scheduled Jobs**  | Every 10 minutes              | `node scripts/publish-scheduled.js` | Transitions scheduled vacancies whose publication timestamp has passed to published status.                              |
+| **Send Daily Email Digest** | Daily (02:30 UTC / 08:00 IST) | `node scripts/daily-digest.js`      | Matches jobs published within the last 24 hours against confirmed subscriber preferences and sends personalized digests. |
 
 Note: Standalone background scripts run outside the Next.js runtime. Public ISR listings update automatically on their 300-second revalidation cycle.
 

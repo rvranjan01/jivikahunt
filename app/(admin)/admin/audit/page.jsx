@@ -60,17 +60,25 @@ export default function AuditLogPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Security & Activity Audit Log</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Security & Activity Audit Log
+          </h1>
           <p className="mt-1 text-sm text-slate-500">
-            Immutable system audit trail tracking authentication, administration, and content modifications.
+            Immutable system audit trail tracking authentication, administration, and content
+            modifications.
           </p>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <form onSubmit={handleFilterSubmit} className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
-        <div className="flex-1 min-w-[240px]">
-          <label htmlFor="actionFilter" className="sr-only">Filter by action prefix</label>
+      <form
+        onSubmit={handleFilterSubmit}
+        className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-xs"
+      >
+        <div className="min-w-[240px] flex-1">
+          <label htmlFor="actionFilter" className="sr-only">
+            Filter by action prefix
+          </label>
           <input
             id="actionFilter"
             type="text"
@@ -95,7 +103,7 @@ export default function AuditLogPage() {
             Clear
           </button>
         )}
-        <span className="text-xs text-slate-500 ml-auto">
+        <span className="ml-auto text-xs text-slate-500">
           Total Records: <strong>{pagination.total}</strong>
         </span>
       </form>
@@ -110,13 +118,23 @@ export default function AuditLogPage() {
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200 text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 font-semibold uppercase tracking-wider">
+            <thead className="bg-slate-50 font-semibold tracking-wider text-slate-600 uppercase">
               <tr>
-                <th scope="col" className="px-4 py-3">Time (IST)</th>
-                <th scope="col" className="px-4 py-3">Actor</th>
-                <th scope="col" className="px-4 py-3">Action</th>
-                <th scope="col" className="px-4 py-3">Target</th>
-                <th scope="col" className="px-4 py-3">IP Hash</th>
+                <th scope="col" className="px-4 py-3">
+                  Time (IST)
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Actor
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Action
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Target
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  IP Hash
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -135,7 +153,7 @@ export default function AuditLogPage() {
               ) : (
                 entries.map((entry) => (
                   <tr key={entry.id} className="hover:bg-slate-50/50">
-                    <td className="px-4 py-3 font-mono text-slate-600 whitespace-nowrap">
+                    <td className="px-4 py-3 font-mono whitespace-nowrap text-slate-600">
                       {entry.timeIST}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -146,10 +164,10 @@ export default function AuditLogPage() {
                         {entry.action}
                       </span>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap font-mono text-slate-600">
+                    <td className="px-4 py-3 font-mono whitespace-nowrap text-slate-600">
                       {entry.targetType !== '—' ? `${entry.targetType}:${entry.targetId}` : '—'}
                     </td>
-                    <td className="px-4 py-3 font-mono text-slate-400 whitespace-nowrap">
+                    <td className="px-4 py-3 font-mono whitespace-nowrap text-slate-400">
                       {entry.ipHash}
                     </td>
                   </tr>
@@ -161,7 +179,7 @@ export default function AuditLogPage() {
 
         {/* Pagination Controls */}
         {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-slate-200 px-4 py-3 bg-slate-50 sm:px-6">
+          <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3 sm:px-6">
             <span className="text-xs text-slate-500">
               Page {pagination.page} of {pagination.totalPages}
             </span>

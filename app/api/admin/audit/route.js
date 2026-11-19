@@ -33,7 +33,10 @@ export async function GET(request) {
 
   const query = {};
   if (actionPrefix) {
-    query.action = { $regex: `^${actionPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, $options: 'i' };
+    query.action = {
+      $regex: `^${actionPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`,
+      $options: 'i',
+    };
   }
 
   try {
