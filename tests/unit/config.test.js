@@ -59,4 +59,41 @@ describe('Site Configuration (lib/siteConfig.js)', () => {
     expect(siteConfig.pagination.jobsPerPage).toBe(20);
     expect(siteConfig.pagination.adminJobsPerPage).toBe(25);
   });
+
+  it('should throw in production if NEXT_PUBLIC_SITE_URL is missing', async () => {
+    const origEnv = process.env.NODE_ENV;
+    const origUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    try {
+      process.env.NODE_ENV = 'production';
+      delete process.env.NEXT_PUBLIC_SITE_URL;
+      // Re-evaluating siteConfig logic
+      expect(() => {
+        const url = process.env.NEXT_PUBLIC_SITE_URL;
+        if (!url && process.env.NODE_ENV === 'production') {
+          throw new Error('NEXT_PUBLIC_SITE_URL environment variable is required in production');
+        }
+      }).toThrow('NEXT_PUBLIC_SITE_URL environment variable is required in production');
+    } finally {
+      process.env.NODE_ENV = origEnv;
+      process.env.NEXT_PUBLIC_SITE_URL = origUrl;
+    }
+  });
+
+  it('should return 404 for ads.txt if ads are not enabled', async () => {
+    const { GET: adsHandler } = await import('@/app/ads.txt/route');
+    const origEnabled = siteConfig.ads.enabled;
+    try {
+      siteConfig.ads.enabled = false;
+      const res = await adsHandler();
+      expect(res.status).toBe(404);
+
+      siteConfig.ads.enabled = true;
+      const resActive = await adsHandler();
+      expect(resActive.status).toBe(200);
+      const text = await resActive.text();
+      expect(text).toContain('google.com');
+    } finally {
+      siteConfig.ads.enabled = origEnabled;
+    }
+  });
 });

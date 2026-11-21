@@ -9,7 +9,8 @@ import ReportButton from '@/components/ReportButton';
 import SaveJobButton from '@/components/SaveJobButton';
 import { getPublicJobBySlug, getRelatedJobs } from '@/lib/publicJobs';
 import { formatIST } from '@/lib/time';
-import { generateJobPostingJsonLd } from '@/lib/jsonLd';
+import { generateJobPostingJsonLd, safeJsonLd } from '@/lib/jsonLd';
+import JobViewTracker from '@/components/JobViewTracker';
 import siteConfig from '@/lib/siteConfig';
 
 export const revalidate = 300;
@@ -413,9 +414,12 @@ export default async function JobDetailPage({ params }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generateJobPostingJsonLd(job)),
+          __html: safeJsonLd(generateJobPostingJsonLd(job)),
         }}
       />
+
+      {/* View tracker: fires one POST per session, server-side rate-limited */}
+      <JobViewTracker slug={job.slug} />
 
       {/* 11. Related Jobs (max 4) */}
       {relatedJobs.length > 0 && (

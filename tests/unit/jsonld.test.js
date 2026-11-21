@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateJobPostingJsonLd, generateBreadcrumbJsonLd } from '@/lib/jsonLd';
+import { generateJobPostingJsonLd, generateBreadcrumbJsonLd, safeJsonLd } from '@/lib/jsonLd';
 
 describe('JobPosting & Breadcrumbs Structured Data (lib/jsonLd.js)', () => {
   it('should generate valid Google JobPosting schema for an onsite job', () => {
@@ -72,5 +72,28 @@ describe('JobPosting & Breadcrumbs Structured Data (lib/jsonLd.js)', () => {
     expect(schema.itemListElement).toHaveLength(3);
     expect(schema.itemListElement[0].position).toBe(1);
     expect(schema.itemListElement[2].name).toBe('Python Developer');
+  });
+
+  describe('safeJsonLd()', () => {
+    it('escapes < to prevent </script> injection', () => {
+      const obj = { title: '</script><script>alert(1)</script>' };
+      const output = safeJsonLd(obj);
+      expect(output).not.toContain('</script>');
+      expect(output).toContain('\\u003c/script>');
+    });
+
+    it('escapes U+2028 and U+2029 line/paragraph separators', () => {
+      const obj = { body: 'line\u2028break\u2029here' };
+      const output = safeJsonLd(obj);
+      expect(output).not.toContain('\u2028');
+      expect(output).not.toContain('\u2029');
+      expect(output).toContain('\\u2028');
+      expect(output).toContain('\\u2029');
+    });
+
+    it('produces valid JSON after escaping', () => {
+      const obj = { title: 'Hello <World>', a: 1 };
+      expect(() => JSON.parse(safeJsonLd(obj))).not.toThrow();
+    });
   });
 });

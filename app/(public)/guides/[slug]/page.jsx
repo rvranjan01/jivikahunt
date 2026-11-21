@@ -7,6 +7,7 @@ import AuthorBox from '@/components/AuthorBox';
 import { renderMarkdown } from '@/lib/markdown';
 import { formatIST } from '@/lib/time';
 import siteConfig from '@/lib/siteConfig';
+import { safeJsonLd } from '@/lib/jsonLd';
 
 export const revalidate = 300;
 
@@ -195,7 +196,7 @@ export default async function GuideReaderPage({ params }) {
       {/* Article Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(articleJsonLd) }}
       />
     </div>
   );

@@ -32,6 +32,10 @@ const SubscriberSchema = new mongoose.Schema(
       default: null,
       index: true,
     },
+    confirmTokenSentAt: {
+      type: Date,
+      default: null,
+    },
     confirmedAt: {
       type: Date,
       default: null,

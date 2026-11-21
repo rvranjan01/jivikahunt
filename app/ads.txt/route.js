@@ -7,6 +7,10 @@ import siteConfig from '@/lib/siteConfig';
  * @returns {Response}
  */
 export async function GET() {
+  if (!siteConfig.ads.enabled) {
+    return new Response('Not Found', { status: 404 });
+  }
+
   return new Response(siteConfig.ads.adsTxtContent, {
     status: 200,
     headers: {
