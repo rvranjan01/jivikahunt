@@ -41,7 +41,7 @@ export default async function HomePage({ searchParams }) {
         <div className="max-w-2xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-100/60 px-3 py-1 text-xs font-bold text-blue-800">
             <span className="h-2 w-2 animate-pulse rounded-full bg-blue-600" />
-            Curated Opportunities • Zero Application Fees
+            Fresher Jobs and Internships
           </div>
 
           <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
@@ -49,8 +49,8 @@ export default async function HomePage({ searchParams }) {
           </h1>
 
           <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
-            Apply directly to official careers portals at top tech firms, startups, and enterprises.
-            No application fees, no third-party recruiters, and no expired listings.
+            Find fresher and intern openings and apply directly on the official company career
+            pages. We never charge application fees.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-2">

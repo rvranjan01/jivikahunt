@@ -86,12 +86,25 @@ test.describe('Admin & Contributor End-to-End Workflows', () => {
     await page.fill('input[placeholder="e.g. Bengaluru, Pune, Hyderabad"]', 'Hyderabad, Remote');
     await page.fill(
       'textarea[placeholder="Concise overview explaining the role, department, and opportunity..."]',
-      'Exciting opportunity for fresh college graduates to join CloudSolutions India building and managing robust cloud architecture for enterprise clients.'
+      'Exciting career opportunity for fresh college graduates to join CloudSolutions India building, deploying, and managing robust enterprise cloud architecture and modern distributed infrastructure.'
+    );
+    await page.fill(
+      'textarea[placeholder^="Develop features"]',
+      'Manage cloud server infrastructure and deploy services\nCollaborate with engineering teams on automated deployment pipelines'
+    );
+    await page.fill(
+      'textarea[placeholder^="B.Tech"]',
+      'B.Tech / B.E in CS, IT, or related technical disciplines\nGraduating batch 2025 or 2026 with no active backlogs'
     );
     await page.fill(
       'input[placeholder="https://careers.company.com/jobs/12345"]',
       'https://cloudsolutions.example.com/careers/associate'
     );
+
+    // Check quality confirmation checkboxes
+    await page.locator('label:has-text("I opened the apply link") input').check();
+    await page.locator('label:has-text("does not ask applicants for any payment") input').check();
+    await page.locator('label:has-text("This is a real open job") input').check();
 
     // Publish immediately
     await page.click('button:has-text("Publish Immediately")');
