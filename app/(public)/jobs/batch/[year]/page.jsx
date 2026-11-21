@@ -30,7 +30,7 @@ export async function generateMetadata({ params }) {
   }
 
   const title = `${batchYear} Batch Freshers Jobs & Campus Hiring | JivikaHunt`;
-  const description = `Find ${total} verified job drives and internships open for ${batchYear} batch graduates across India. Apply directly on official employer career pages.`;
+  const description = `Find ${total} job drives and internships open for ${batchYear} batch graduates across India. Apply directly on official employer career pages.`;
 
   return {
     title,

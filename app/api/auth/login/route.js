@@ -1,7 +1,7 @@
 /**
  * @file app/api/auth/login/route.js
  * @description Secure authentication handler. Enforces IP/email rate-limiting,
- * password verification, mandatory admin TOTP 2FA, and issues httpOnly session cookies.
+ * password verification, and issues httpOnly session cookies.
  */
 
 import { NextResponse } from 'next/server';
@@ -9,7 +9,6 @@ import { connectToDatabase } from '@/lib/db';
 import User from '@/models/User';
 import { loginSchema } from '@/lib/validation';
 import { verifyPassword, createSessionToken, setSessionCookie } from '@/lib/auth';
-import { verifyTotpToken } from '@/lib/totp';
 import { checkLoginRateLimit, recordFailedLogin, clearLoginRateLimit } from '@/lib/rateLimit';
 import { getClientIp, hashIp, sanitizeNoSql, assertSameOrigin } from '@/lib/security';
 import { recordAuditLog } from '@/lib/audit';
@@ -35,7 +34,7 @@ export async function POST(request) {
       );
     }
 
-    const { email, password, totpCode } = validationResult.data;
+    const { email, password } = validationResult.data;
 
     // 1. Check rate limits per IP and per email
     const rateLimit = await checkLoginRateLimit(ip, email);
@@ -98,48 +97,7 @@ export async function POST(request) {
       return NextResponse.json({ error: invalidCredentialsError }, { status: 401 });
     }
 
-    // 4. Admin 2FA Verification
-    const is2FaRequired = process.env.ADMIN_2FA_REQUIRED !== 'false';
-
-    if (user.role === 'admin' && is2FaRequired) {
-      if (!user.totpSecret) {
-        // Uninitialized admin TOTP configuration
-        return NextResponse.json(
-          {
-            error: `2FA is not set up. Run: node --env-file=.env scripts/enable-2fa.js ${user.email}`,
-          },
-          { status: 400 }
-        );
-      }
-
-      if (!totpCode) {
-        // Return challenge to UI indicating password was valid, but 2FA is required
-        return NextResponse.json(
-          {
-            requires2FA: true,
-            message: 'Please provide the 6-digit 2FA code from your authenticator app.',
-          },
-          { status: 200 }
-        );
-      }
-
-      const isTotpValid = verifyTotpToken(user.totpSecret, totpCode);
-      if (!isTotpValid) {
-        await recordFailedLogin(ip, email);
-        await recordAuditLog({
-          action: 'login.failure.bad_totp',
-          actorId: user._id,
-          actorEmail: email,
-          ipHash: ipHashed,
-        });
-        return NextResponse.json(
-          { error: 'Invalid 2FA code. Please verify your authenticator app.' },
-          { status: 401 }
-        );
-      }
-    }
-
-    // 5. Success: clear rate limits, issue token, record audit
+    // 4. Success: clear rate limits, issue token, record audit
     await clearLoginRateLimit(ip, email);
 
     const token = await createSessionToken({

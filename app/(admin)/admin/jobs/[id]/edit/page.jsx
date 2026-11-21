@@ -29,6 +29,11 @@ export default function EditJobPage({ params }) {
   const [lastDate, setLastDate] = useState('');
   const [status, setStatus] = useState('published');
 
+  // Quality Confirmation Checkboxes (required before Publish/Save for active posts)
+  const [confirmLiveJob, setConfirmLiveJob] = useState(true);
+  const [confirmNoPayment, setConfirmNoPayment] = useState(true);
+  const [confirmRealJob, setConfirmRealJob] = useState(true);
+
   // UI state
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -145,6 +150,29 @@ export default function EditJobPage({ params }) {
       .map((e) => e.trim())
       .filter((e) => e.length > 0);
 
+    if (status !== 'draft') {
+      if (summary.trim().length < 150) {
+        setError('Summary must be at least 150 characters when publishing.');
+        setSaving(false);
+        return;
+      }
+      if (responsibilitiesArray.length < 2) {
+        setError('At least 2 responsibilities are required when publishing.');
+        setSaving(false);
+        return;
+      }
+      if (eligibilityArray.length < 2) {
+        setError('At least 2 eligibility points are required when publishing.');
+        setSaving(false);
+        return;
+      }
+      if (!confirmLiveJob || !confirmNoPayment || !confirmRealJob) {
+        setError('Please verify all three quality checklist items before saving active post.');
+        setSaving(false);
+        return;
+      }
+    }
+
     const payload = {
       title,
       company: {
@@ -164,6 +192,12 @@ export default function EditJobPage({ params }) {
       applyUrl,
       lastDate: lastDate || null,
       status,
+      confirmLiveJob,
+      confirmNoPayment,
+      confirmRealJob,
+      confirmedLiveLink: confirmLiveJob,
+      confirmedNoPayment: confirmNoPayment,
+      confirmedRealJob: confirmRealJob,
     };
 
     try {
@@ -320,6 +354,7 @@ export default function EditJobPage({ params }) {
                 onChange={(e) => setLocations(e.target.value)}
                 className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-blue-600 focus:outline-none"
               />
+              <p className="mt-1 text-xs text-slate-400">City, State (e.g. Pune, Maharashtra)</p>
             </div>
 
             <div>
@@ -369,6 +404,43 @@ export default function EditJobPage({ params }) {
               className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-blue-600 focus:outline-none sm:w-64"
             />
           </div>
+
+          {status !== 'draft' && (
+            <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs font-bold text-slate-800">Publish Checklist (Required) *</p>
+              <label className="flex cursor-pointer items-start gap-2 text-xs text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={confirmLiveJob}
+                  onChange={(e) => setConfirmLiveJob(e.target.checked)}
+                  className="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span>
+                  I opened the apply link and it is a live job on the company&apos;s official site
+                </span>
+              </label>
+              <label className="flex cursor-pointer items-start gap-2 text-xs text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={confirmNoPayment}
+                  onChange={(e) => setConfirmNoPayment(e.target.checked)}
+                  className="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span>This job does not ask applicants for any payment or deposit</span>
+              </label>
+              <label className="flex cursor-pointer items-start gap-2 text-xs text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={confirmRealJob}
+                  onChange={(e) => setConfirmRealJob(e.target.checked)}
+                  className="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span>
+                  This is a real open job, not an event, walk-in drive or resume collection
+                </span>
+              </label>
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
             <Link

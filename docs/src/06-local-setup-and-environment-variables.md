@@ -50,7 +50,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `JWT_SECRET`                    | Yes      | 32+ character key for JWT token signing        |
 | `JWT_EXPIRY`                    | No       | Expiration time (default: `12h`)               |
 | `HASH_SALT`                     | Yes      | Salt for hashing user IP addresses             |
-| `ADMIN_TOTP_SECRET`             | No       | Default TOTP secret for admin initialization   |
 | `RESEND_API_KEY`                | Optional | API key for transactional emails               |
 | `RESEND_FROM_EMAIL`             | Optional | Sender address (e.g., `alerts@jivikahunt.com`) |
 | `TELEGRAM_BOT_TOKEN`            | Optional | Bot token for channel auto-posting             |

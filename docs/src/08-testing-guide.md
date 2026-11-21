@@ -6,7 +6,7 @@ JivikaHunt implements a three-tier test automation strategy:
 
 1. **Unit Tests (Vitest)**: Core utilities, slug generators, date & expiry calculations, image magic byte signatures, and Zod schemas.
 2. **API Tests (Vitest)**: Route handlers, auth rules, contributor permission boundaries, rate limits, image uploads, and job ingestion pipelines.
-3. **End-to-End Tests (Playwright)**: Full browser workflows, 2FA admin login, job authoring, public browsing, and accessibility audits.
+3. **End-to-End Tests (Playwright)**: Full browser workflows, admin login, job authoring, public browsing, and accessibility audits.
 
 ## 2. Running Tests
 
@@ -31,8 +31,8 @@ npx playwright test tests/e2e/a11y-mobile.spec.js --project="Mobile Chrome"
 
 JivikaHunt's E2E test suite validates real-browser workflows using Playwright with desktop and mobile viewports:
 
-- **Isolated Seeding (`tests/e2e/fixtures/seed.js`)**: Executes in `global-setup.js` before worker instantiation. Sets up an admin user with RFC-compliant 32-char Base32 TOTP secret, contributor credentials, active sample jobs, expired listings, and career guides.
-- **Admin Workflow (`tests/e2e/auth-admin.spec.js`)**: Validates 2FA prompt enforcement, invalid password rejection, TOTP verification via `otplib`, contributor invitations, and contributor job publishing with ChatGPT extraction prompt assistance.
+- **Isolated Seeding (`tests/e2e/fixtures/seed.js`)**: Executes in `global-setup.js` before worker instantiation. Sets up an admin user, contributor credentials, active sample jobs, expired listings, and career guides.
+- **Admin Workflow (`tests/e2e/auth-admin.spec.js`)**: Validates invalid password rejection, direct admin login, contributor invitations, and contributor job publishing with ChatGPT extraction prompt assistance.
 - **Public Workflow (`tests/e2e/public-site.spec.js`)**: Exercises live job browsing, full-text search, query parameter filtering (Remote, Internships), detail page hierarchy, `nofollow noopener noreferrer` apply link generation, Web Share and copy link interactions, contributor personal email leakage audits, broken link modal submissions with IP rate limits, client-side saved jobs bookmarks (`localStorage`), expired job notice banners with `noindex`, and cookie consent banner dismissal and script gating.
 - **Automated Accessibility Auditing (`@axe-core/playwright`)**: In `tests/e2e/a11y-mobile.spec.js`, runs automated WCAG 2.1 AA audits across `/`, `/jobs`, `/guides`, `/jobs/[slug]`, and `/admin/login`, asserting zero critical accessibility violations.
 - **Responsive Mobile Testing**: Validates mobile navigation drawer toggle, menu accessibility, and touch targets using the Pixel 5 viewport profile.
@@ -46,11 +46,11 @@ JivikaHunt's E2E test suite validates real-browser workflows using Playwright wi
 | TC-03   | Unit     | IST Expiry logic        | Deadlines correctly evaluate to 23:59:59.999 Asia/Kolkata (18:29:59.999 UTC).      | Passed |
 | TC-04   | Unit     | Zod URL validator       | Rejects URL shorteners, non-HTTPS protocols, and user credentials.                 | Passed |
 | TC-05   | Unit     | NoSQL Sanitizer         | Strips keys containing `$` or `.`.                                                 | Passed |
-| TC-06   | Unit     | TOTP 2FA                | Verifies RFC 6238 tokens and rejects malformed/invalid codes.                      | Passed |
+| TC-06   | Unit     | Password Policy         | Enforces minimum 8 chars with letters and numbers in validation schemas.           | Passed |
 | TC-07   | Unit     | Image Magic Bytes       | Detects genuine PNG/JPEG/WebP; rejects executables, SVGs, and text files.          | Passed |
 | TC-08   | Unit     | Job Zod Schema          | Validates job fields, enforces summary min 40 chars, rejects missing locations.    | Passed |
 | TC-09   | API      | Health check            | `/api/health` returns status `ok` and uptime details.                              | Passed |
-| TC-10   | API      | Admin 2FA login         | Admin login requires correct TOTP token; rejects invalid tokens.                   | Passed |
+| TC-10   | API      | Admin login             | Admin login succeeds with email and password; sets secure session cookie.          | Passed |
 | TC-11   | API      | Contributor isolation   | Contributor cannot edit or delete another contributor's post (HTTP 403).           | Passed |
 | TC-12   | API      | Deactivated user        | Deactivated user token rejected immediately on subsequent requests.                | Passed |
 | TC-13   | API      | Rate limiting           | 6th failed login within window receives HTTP 429 lock.                             | Passed |
@@ -73,7 +73,7 @@ JivikaHunt's E2E test suite validates real-browser workflows using Playwright wi
 | TC-30   | API      | Double Opt-In Alerts    | Issues confirmation tokens, confirms subscribers, handles one-click unsubscribe.   | Passed |
 | TC-31   | API      | Guide Author Isolation  | Contributors restricted to viewing/editing own guides (HTTP 403); Admin can edit   | Passed |
 | TC-32   | API      | Saved Jobs Lookup       | Validates batches of IDs, drops invalid ObjectIds, returns active postings only.   | Passed |
-| TC-33   | E2E      | Admin 2FA & Auth Flow   | Tests invalid credentials rejection, TOTP verification, and session creation.      | Passed |
+| TC-33   | E2E      | Admin Auth Flow         | Tests invalid credentials rejection, direct login, and session creation.           | Passed |
 | TC-34   | E2E      | Contributor Management  | Admin invites contributor; contributor logs in and accesses posting portal.        | Passed |
 | TC-35   | E2E      | E2E Job Publishing      | Contributor posts job using form; verified published on public index.              | Passed |
 | TC-36   | E2E      | Public Portal & Privacy | Tests search, filters, safe apply links, no email leakage, report modal, save.     | Passed |

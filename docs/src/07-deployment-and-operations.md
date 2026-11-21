@@ -23,7 +23,6 @@ JivikaHunt is designed for cloud portability. The primary production deployment 
    heroku config:set JWT_SECRET="your_secure_32_char_jwt_secret_key"
    heroku config:set HASH_SALT="your_secure_random_salt_for_ip_hashes"
    heroku config:set NODE_ENV="production"
-   heroku config:set ADMIN_2FA_REQUIRED="true"
 
    # Site & Public Configuration
    heroku config:set NEXT_PUBLIC_SITE_URL="https://jivikahunt.com"

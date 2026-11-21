@@ -5,7 +5,6 @@ import path from 'path';
 describe('CLI Scripts Dry-Run Execution', () => {
   const scripts = [
     'scripts/seed-admin.js',
-    'scripts/enable-2fa.js',
     'scripts/daily-digest.js',
     'scripts/publish-scheduled.js',
   ];
@@ -22,4 +21,15 @@ describe('CLI Scripts Dry-Run Execution', () => {
       expect(result.stdout).toContain('Dry run:');
     });
   }
+
+  it('scripts/seed-admin.js should reject passwords shorter than 8 characters', () => {
+    const scriptPath = path.resolve(process.cwd(), 'scripts/seed-admin.js');
+    const result = spawnSync(process.execPath, [scriptPath, 'test@example.com', 'short'], {
+      encoding: 'utf8',
+      env: { ...process.env, NODE_ENV: 'test' },
+    });
+
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('at least 8 characters');
+  });
 });

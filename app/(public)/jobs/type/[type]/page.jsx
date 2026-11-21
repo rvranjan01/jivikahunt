@@ -51,7 +51,7 @@ export async function generateMetadata({ params }) {
 
   return {
     title: `${typeConfig.title} | ${siteConfig.name}`,
-    description: `${typeConfig.desc} Featuring ${total} verified positions.`,
+    description: `${typeConfig.desc} Featuring ${total} positions.`,
     alternates: {
       canonical: `${siteConfig.url}/jobs/type/${normalized}`,
     },

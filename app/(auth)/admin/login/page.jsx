@@ -8,8 +8,6 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [totpCode, setTotpCode] = useState('');
-  const [requires2FA, setRequires2FA] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -22,20 +20,13 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, totpCode }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
         setError(data.error || 'Authentication failed. Please verify credentials.');
-        setLoading(false);
-        return;
-      }
-
-      if (data.requires2FA) {
-        setRequires2FA(true);
-        setError('');
         setLoading(false);
         return;
       }
@@ -85,8 +76,7 @@ export default function AdminLoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={requires2FA}
-              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none disabled:bg-slate-100"
+              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none"
               placeholder="you@jivikahunt.com"
             />
           </div>
@@ -101,42 +91,17 @@ export default function AdminLoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={requires2FA}
-              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none disabled:bg-slate-100"
+              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none"
               placeholder="••••••••••••"
             />
           </div>
-
-          {requires2FA && (
-            <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-              <label className="block text-xs font-bold text-blue-900" htmlFor="totpCode">
-                Two-Factor Authentication (2FA) Code
-              </label>
-              <p className="mt-0.5 text-xs text-blue-700">
-                Enter the 6-digit code from your authenticator app
-              </p>
-              <input
-                id="totpCode"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={6}
-                required
-                autoFocus
-                value={totpCode}
-                onChange={(e) => setTotpCode(e.target.value)}
-                className="mt-2 block w-full rounded-lg border border-blue-300 bg-white px-3 py-2 text-center font-mono text-lg tracking-widest text-slate-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none"
-                placeholder="123456"
-              />
-            </div>
-          )}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
           >
-            {loading ? 'Authenticating...' : requires2FA ? 'Verify 2FA & Sign In' : 'Sign In'}
+            {loading ? 'Authenticating...' : 'Sign In'}
           </button>
         </form>
 

@@ -61,8 +61,8 @@ export default function JobAlertsBanner() {
             Never miss a college fresher drive
           </h3>
           <p className="mt-1.5 text-xs leading-relaxed text-blue-100 sm:text-sm">
-            Get the newest verified freshers jobs and internships sent to your inbox every morning.
-            Zero spam, double opt-in, unsubscribe anytime with one click.
+            Get the newest freshers jobs and internships sent to your inbox every morning. Zero
+            spam, double opt-in, unsubscribe anytime with one click.
           </p>
         </div>
 

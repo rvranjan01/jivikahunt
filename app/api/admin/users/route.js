@@ -24,10 +24,7 @@ export async function GET(request) {
   }
 
   await connectToDatabase();
-  const users = await User.find({})
-    .select('-passwordHash -totpSecret')
-    .sort({ createdAt: -1 })
-    .lean();
+  const users = await User.find({}).select('-passwordHash').sort({ createdAt: -1 }).lean();
 
   return NextResponse.json({
     success: true,

@@ -14,7 +14,6 @@ import bcrypt from 'bcryptjs';
 export const TEST_ADMIN = {
   email: 'e2e-admin@jivikahunt.com',
   password: 'AdminPassword123!',
-  totpSecret: 'G4MXQWRJH6PAN3TN324AAOWF4EPBYS7M', // 32-char Base32 RFC-compliant secret
   displayName: 'Founder Admin',
   role: 'admin',
 };
@@ -55,12 +54,10 @@ export async function seedTestData() {
       isActive: true,
       mustChangePassword: false,
       tokenVersion: 1,
-      totpSecret: TEST_ADMIN.totpSecret,
       bio: 'Administrator at JivikaHunt team.',
     });
   } else {
     admin.passwordHash = adminPasswordHash;
-    admin.totpSecret = TEST_ADMIN.totpSecret;
     admin.isActive = true;
     admin.mustChangePassword = false;
     await admin.save();

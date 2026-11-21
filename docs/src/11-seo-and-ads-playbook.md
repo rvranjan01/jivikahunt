@@ -8,13 +8,24 @@ JivikaHunt is optimized for search engines to attract organic traffic from stude
 
 Every job listing includes Google Jobs compliant JSON-LD structured data:
 
-- `title`: Job title.
-- `description`: Clean text summary and responsibilities.
-- `datePosted`: Original publication timestamp (ISO).
+- `title`: Job title (validated: max 100 chars, no all-caps, no promotional phrases like "hiring now", no company name embedded).
+- `description`: Rich HTML description formatted using only safe `<p>`, `<ul>`, and `<li>` tags with all dynamic values escaped (`&`, `<`, `>`). Includes summary, company, location, workMode, type, salary (if provided), batches, last date, responsibilities, eligibility, and skills.
+- `datePosted`: Original first publication timestamp (`publishedAt` falling back to `createdAt`).
 - `validThrough`: Expiry timestamp in ISO IST format.
-- `hiringOrganization`: Company name and logo.
-- `jobLocation` / `jobLocationType`: Configured as `TELECOMMUTE` for remote jobs or postal address for physical cities.
+- `identifier`: PropertyValue containing the employer name and internal Job ID.
+- `hiringOrganization`: Employer Organization without redundant sameAs.
+- `jobLocation` / `jobLocationType`: Configured as `TELECOMMUTE` for remote jobs; parsed as `addressLocality` and `addressRegion` for "City, State", or nationwide `addressCountry: 'IN'` for "Pan India" / "India".
 - `directApply`: Explicitly set to `false` because applicants apply on the external company site.
+- **Expired Job Suppression**: When a job expires, the JSON-LD `<script>` tag is completely omitted from the HTML markup, while keeping the visual expired alert banner and `<meta name="robots" content="noindex, follow" />`.
+
+### Google Job Posting Quality Policies
+
+The system enforces Google's technical and editorial quality policies at ingestion time:
+
+- No fees, deposits, or pay-to-work scams.
+- Real open job requisitions only (no resume collecting or training events).
+- Live verified direct apply link to company career portal.
+- Minimum 150 characters summary, at least 2 responsibilities, at least 2 eligibility requirements.
 
 ### Programmatic Landing Pages
 

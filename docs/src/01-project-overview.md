@@ -37,5 +37,4 @@ The public experience prioritizes accessibility, crawlability, and zero friction
 - **Fresher**: A recent college graduate seeking their first full-time role (0-1 years of experience).
 - **Intern**: A current college student or recent graduate working short-term for practical experience.
 - **IST (Asia/Kolkata)**: Indian Standard Time (UTC+05:30). All deadline and expiry logic on JivikaHunt operates in IST.
-- **2FA (Two-Factor Authentication)**: An extra security layer requiring a 6-digit TOTP code generated on a mobile authenticator app.
 - **ISR (Incremental Static Regeneration)**: A Next.js mechanism that serves pre-rendered pages instantly and updates them in the background when changes occur.

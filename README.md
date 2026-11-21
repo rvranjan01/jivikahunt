@@ -12,7 +12,7 @@ JivikaHunt aggregates entry-level job opportunities and internships across India
 - **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas) with [Mongoose](https://mongoosejs.com/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 - **Validation**: [Zod](https://zod.dev/)
-- **Security & Auth**: `bcryptjs` for password hashing, `jose` for stateless JWT session cookies, and `otplib` for admin TOTP 2FA
+- **Security & Auth**: `bcryptjs` for password hashing, and `jose` for stateless JWT session cookies
 - **Image Pipeline**: [Sharp](https://sharp.pixelplumbing.com/) (WebP re-encoding and in-database storage)
 - **Email Service**: [Resend](https://resend.com/)
 - **Testing**: [Vitest](https://vitest.dev/) (Unit and API tests), [Playwright](https://playwright.dev/) (End-to-End browser tests), `@axe-core/playwright` (Accessibility audits)

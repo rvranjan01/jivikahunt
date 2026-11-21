@@ -46,11 +46,14 @@ describe('Job Validation Schema (lib/validation.js)', () => {
       salary: '8 - 12 LPA',
       skills: ['react', 'javascript', 'typescript'],
       summary:
-        'Razorpay is seeking ambitious engineering graduates to build next-generation payment experiences.',
+        'Razorpay is seeking ambitious engineering graduates to build next-generation payment experiences across our scalable high-performance core processing platforms.',
       responsibilities: ['Build UI components', 'Write unit tests'],
       eligibility: ['B.Tech / B.E in Computer Science', '60% or 6.5 CGPA minimum'],
       applyUrl: 'https://careers.razorpay.com/jobs/junior-react-developer',
       status: 'published',
+      confirmLiveJob: true,
+      confirmNoPayment: true,
+      confirmRealJob: true,
     };
 
     it('should validate complete job payload', () => {

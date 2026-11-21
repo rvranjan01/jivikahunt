@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Browse Jobs & Internships',
   description:
-    'Search and filter verified entry-level fresher jobs, tech internships, and remote openings across India.',
+    'Search and filter entry-level fresher jobs, tech internships, and remote openings across India.',
 };
 
 /**
@@ -43,8 +43,7 @@ export default async function JobsPage({ searchParams }) {
           Browse All Opportunities
         </h1>
         <p className="mt-1 text-xs text-slate-500">
-          Discover verified roles for freshers, college graduates, and interns with direct
-          application links.
+          Discover roles for freshers, college graduates, and interns with direct application links.
         </p>
       </div>
 

@@ -97,7 +97,7 @@ export async function POST(request) {
       {
         success: true,
         message:
-          'Report submitted successfully. Thank you for helping keep JivikaHunt clean and verified.',
+          'Report submitted successfully. Thank you for helping keep JivikaHunt clean and accurate.',
       },
       { status: 201 }
     );

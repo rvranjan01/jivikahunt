@@ -143,11 +143,14 @@ describe('Admin & Contributor Jobs API Handlers', () => {
     salary: '4.5 LPA',
     skills: ['java', 'sql'],
     summary:
-      'Wipro is hiring entry-level software trainees for full-time enterprise engineering roles.',
+      'Wipro is hiring entry-level software trainees for full-time enterprise engineering roles across major delivery hubs in India with comprehensive foundational training.',
     responsibilities: ['Write code', 'Test features'],
-    eligibility: ['BE/BTech graduates with 60%+'],
+    eligibility: ['BE/BTech graduates with 60%+', 'No active backlogs at time of joining'],
     applyUrl: 'https://careers.wipro.com/jobs/123456',
     status: 'published',
+    confirmLiveJob: true,
+    confirmNoPayment: true,
+    confirmRealJob: true,
   };
 
   beforeEach(async () => {

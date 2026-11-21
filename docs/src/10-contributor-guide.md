@@ -23,13 +23,33 @@ As a contributor, you curate genuine, high-quality job opportunities for fresh g
    - **Official Apply Link**: Direct, unshortened HTTPS URL to the company's career portal or ATS form.
 5. **Publish**: Click **Publish Immediately** to make the listing live instantly, or **Save as Draft** to finish later.
 
-## 3. Important Posting Guidelines
+## 3. Important Posting Guidelines & Google Job Posting Policy Checklist
 
-- **Strictly No URL Shorteners**: Never use `bit.ly`, `tinyurl.com`, `t.co`, or redirect services. Always link directly to the official company careers page. Shorteners are automatically blocked by the system.
-- **Daily Quota**: Each contributor can publish up to 30 new jobs per 24-hour day.
-- **Respect Deadlines**: If the job posting states a last date to apply, enter it in the "Last Date" field so the system automatically computes expiry at 23:59:59 IST on that day.
-- **WhatsApp Broadcast Helper**: In `/admin/jobs`, click the **WhatsApp** button on any job card to instantly copy pre-formatted, bolded text with emojis ready to paste into WhatsApp channels and student communities.
-- **Duplicate Warnings**: If you attempt to publish a job with the same company, title, and apply URL as an existing listing, the system will display a warning. You can override it by clicking "Publish Anyway" if it is a re-hiring drive.
+To maintain Google Jobs indexing compliance and protect student applicants, all contributors must strictly follow this policy checklist before publishing:
+
+### Google Job Posting Policy Checklist
+
+1. **Official Career Link Verification**: Open the official apply link and verify it leads directly to an active, genuine opening on the employer's official career portal or ATS. Shortened URLs (`bit.ly`, etc.) are blocked.
+2. **Zero Fees or Deposits**: Never post listings requiring any application fees, training deposits, onboarding charges, or purchase of materials.
+3. **Real Open Positions Only**: Every post must represent an actual, open job vacancy. General resume collection drives, promotional webinars, training courses, and non-job events are strictly prohibited.
+4. **Clean, Accurate Job Titles**:
+   - Maximum 100 characters.
+   - Reject ALL-CAPS titles (more than 3 uppercase letters, e.g. "SOFTWARE ENGINEER").
+   - Reject titles containing more than one exclamation mark (`!`).
+   - Do NOT include the company name inside the job title field (e.g. use "Software Engineer", not "Software Engineer at Google").
+   - Reject promotional or urgency buzzwords such as "hiring now", "apply now", "walk-in", or "urgent".
+5. **Quality Content Thresholds on Publish**:
+   - Summary must be at least 150 characters long.
+   - At least 2 key responsibilities required.
+   - At least 2 eligibility criteria points required.
+6. **Location Accuracy**:
+   - Provide standard locations formatted as "City, State" (e.g. "Pune, Maharashtra", "Bengaluru, Karnataka").
+   - Use "Pan India" or "India" only when open nationwide.
+   - Set workMode to "Remote" (`TELECOMMUTE`) only for 100% remote roles available to candidates in India.
+7. **Accurate Deadlines**: Enter the official closing date if known. The form automatically pre-fills 30 days ahead in Asia/Kolkata (IST), expiring at 23:59:59 IST.
+8. **Daily Quota**: Each contributor can publish up to 30 new jobs per 24-hour day.
+9. **WhatsApp Broadcast Helper**: In `/admin/jobs`, click the **WhatsApp** button on any job card to instantly copy pre-formatted, bolded text with emojis ready to paste into WhatsApp channels and student communities.
+10. **Duplicate Warnings**: If you attempt to publish a job with the same company, title, and apply URL as an existing listing, the system will display a warning. You can override it by clicking "Publish Anyway" if it is a re-hiring drive.
 
 ## 4. Starter Career Guide Outlines (Ready to Author)
 

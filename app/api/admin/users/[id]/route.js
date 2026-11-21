@@ -80,7 +80,7 @@ export async function PATCH(request, context) {
     }
 
     const updatedUser = await User.findByIdAndUpdate(id, mongoUpdate, { new: true })
-      .select('-passwordHash -totpSecret')
+      .select('-passwordHash')
       .lean();
 
     await recordAuditLog({

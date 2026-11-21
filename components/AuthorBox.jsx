@@ -16,7 +16,7 @@ export default function AuthorBox({ author }) {
   const name = author?.displayName || 'JivikaHunt Team';
   const bio =
     author?.bio ||
-    'Verified member of the JivikaHunt team curating trusted entry-level opportunities and internships for college students across India.';
+    'Member of the JivikaHunt team curating entry-level opportunities and internships for college students across India.';
 
   return (
     <aside

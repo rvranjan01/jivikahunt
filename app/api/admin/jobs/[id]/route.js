@@ -138,6 +138,9 @@ export async function PUT(request, context) {
     existingJob.lastDate = jobData.lastDate ? new Date(jobData.lastDate) : null;
     existingJob.status = jobData.status;
     existingJob.publishAt = jobData.publishAt ? new Date(jobData.publishAt) : null;
+    if (jobData.status === 'published' && !existingJob.publishedAt) {
+      existingJob.publishedAt = new Date();
+    }
 
     if (user.role === 'admin') {
       existingJob.featured = Boolean(jobData.featured);

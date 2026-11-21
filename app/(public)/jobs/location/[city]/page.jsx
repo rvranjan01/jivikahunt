@@ -31,7 +31,7 @@ export async function generateMetadata({ params }) {
   }
 
   const title = `Fresher Jobs & Internships in ${decoded} | JivikaHunt`;
-  const description = `Discover ${total} verified entry-level job drives and tech internships located in ${decoded}, India. Apply on official company portals.`;
+  const description = `Discover ${total} entry-level job drives and tech internships located in ${decoded}, India. Apply on official company portals.`;
 
   return {
     title,
@@ -97,7 +97,7 @@ export default async function LocationLandingPage({ params, searchParams }) {
           </h1>
 
           <p className="mt-2 text-xs leading-relaxed text-slate-600 sm:text-sm">
-            Explore verified opportunities for college freshers and interns in{' '}
+            Explore opportunities for college freshers and interns in{' '}
             <strong className="font-semibold text-slate-800 capitalize">{decoded}</strong>. Direct
             application links to company careers pages with zero recruiter commissions.
           </p>

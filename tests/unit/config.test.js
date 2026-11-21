@@ -5,7 +5,7 @@ describe('Site Configuration (lib/siteConfig.js)', () => {
   it('should load brand name and core metadata', () => {
     expect(siteConfig).toBeDefined();
     expect(siteConfig.name).toBe('JivikaHunt');
-    expect(siteConfig.tagline).toBeTypeOf('string');
+    expect(siteConfig.tagline).toBe('Fresher Jobs and Internships in India');
     expect(siteConfig.description).toBeTypeOf('string');
     expect(siteConfig.url).toBeTypeOf('string');
     expect(siteConfig.contactEmail).toBe('contact@jivikahunt.com');
@@ -18,7 +18,7 @@ describe('Site Configuration (lib/siteConfig.js)', () => {
     expect(socials.telegram).toContain('t.me');
     expect(socials.whatsapp).toContain('whatsapp.com');
     expect(socials.instagram).toContain('instagram.com');
-    expect(socials.facebook).toContain('facebook.com');
+    expect(socials.facebook).toBeTypeOf('string');
   });
 
   it('should specify correct primary navigation items', () => {
@@ -95,5 +95,60 @@ describe('Site Configuration (lib/siteConfig.js)', () => {
     } finally {
       siteConfig.ads.enabled = origEnabled;
     }
+  });
+
+  it('SocialLinks renders only links that are set and hides unset ones', async () => {
+    const SocialLinks = (await import('@/components/SocialLinks')).default;
+    const origSocials = { ...siteConfig.socials };
+
+    try {
+      siteConfig.socials = {
+        telegram: 'https://t.me/jivikahunt',
+        whatsapp: 'https://whatsapp.com/channel/0029VaJivikaHunt',
+        facebook: '', // empty
+        instagram: '', // empty
+        linkedin: 'https://linkedin.com/company/jivikahunt',
+      };
+
+      const result = SocialLinks({ variant: 'footer' });
+      expect(result).not.toBeNull();
+      // Rendered items should be 3 (telegram, whatsapp, linkedin)
+      const renderedKeys = result.props.children.map((child) => child.key);
+      expect(renderedKeys).toEqual(['telegram', 'whatsapp', 'linkedin']);
+      expect(renderedKeys).not.toContain('facebook');
+      expect(renderedKeys).not.toContain('instagram');
+
+      // Test with `only` filter
+      const filteredResult = SocialLinks({ only: ['telegram', 'whatsapp'], variant: 'pill' });
+      const filteredKeys = filteredResult.props.children.map((child) => child.key);
+      expect(filteredKeys).toEqual(['telegram', 'whatsapp']);
+      expect(filteredKeys).not.toContain('linkedin');
+
+      // Test when all are empty
+      siteConfig.socials = {
+        telegram: '',
+        whatsapp: '',
+        facebook: '',
+        instagram: '',
+        linkedin: '',
+      };
+      expect(SocialLinks({})).toBeNull();
+    } finally {
+      siteConfig.socials = origSocials;
+    }
+  });
+
+  it('markdown replaceTokens should replace {{siteUrl}}, {{contactEmail}}, and {{socialLinks}}', async () => {
+    const { replaceTokens } = await import('@/lib/markdown');
+    const md = 'Visit {{siteUrl}} or email {{contactEmail}}.\n\n{{socialLinks}}';
+    const output = replaceTokens(md);
+
+    expect(output).toContain(siteConfig.url);
+    expect(output).toContain(siteConfig.contactEmail);
+    expect(output).toContain('Telegram');
+    expect(output).toContain('WhatsApp');
+    expect(output).not.toContain('{{siteUrl}}');
+    expect(output).not.toContain('{{contactEmail}}');
+    expect(output).not.toContain('{{socialLinks}}');
   });
 });

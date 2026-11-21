@@ -3,8 +3,6 @@ import { POST as loginHandler } from '@/app/api/auth/login/route';
 import { POST as logoutHandler } from '@/app/api/auth/logout/route';
 import { POST as changePasswordHandler } from '@/app/api/auth/change-password/route';
 import { hashPassword, createSessionToken } from '@/lib/auth';
-import { createTotpSecret } from '@/lib/totp';
-import { generateSync } from 'otplib';
 
 // Mock DB and Models
 vi.mock('@/lib/db', () => ({
@@ -71,11 +69,9 @@ vi.mock('@/models/LoginAttempt', () => {
 describe('Authentication API Handlers', () => {
   let contributorUser;
   let adminUser;
-  let adminTotpSecret;
 
   beforeEach(async () => {
     mockLoginAttempts = [];
-    adminTotpSecret = createTotpSecret();
 
     contributorUser = {
       _id: '65b89a111111111111111111',
@@ -100,7 +96,6 @@ describe('Authentication API Handlers', () => {
       isActive: true,
       mustChangePassword: false,
       tokenVersion: 1,
-      totpSecret: adminTotpSecret,
     };
 
     mockUsers = [contributorUser, adminUser];
@@ -168,54 +163,13 @@ describe('Authentication API Handlers', () => {
       expect(data.error).toContain('Account temporarily locked');
     });
 
-    it('should require TOTP 2FA for admin accounts without 2FA code', async () => {
-      vi.stubEnv('ADMIN_2FA_REQUIRED', 'true');
-
+    it('should authenticate admin with email and password directly without challenge', async () => {
       const req = new Request('http://localhost:3000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: 'admin@jivikahunt.com',
           password: 'AdminPass123!',
-        }),
-      });
-
-      const res = await loginHandler(req);
-      expect(res.status).toBe(200);
-      const data = await res.json();
-      expect(data.requires2FA).toBe(true);
-    });
-
-    it('should reject admin login with invalid 2FA code', async () => {
-      vi.stubEnv('ADMIN_2FA_REQUIRED', 'true');
-
-      const req = new Request('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'admin@jivikahunt.com',
-          password: 'AdminPass123!',
-          totpCode: '000000',
-        }),
-      });
-
-      const res = await loginHandler(req);
-      expect(res.status).toBe(401);
-      const data = await res.json();
-      expect(data.error).toContain('Invalid 2FA code');
-    });
-
-    it('should authenticate admin when valid password and valid TOTP code provided', async () => {
-      vi.stubEnv('ADMIN_2FA_REQUIRED', 'true');
-      const validTotp = generateSync({ secret: adminTotpSecret });
-
-      const req = new Request('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'admin@jivikahunt.com',
-          password: 'AdminPass123!',
-          totpCode: validTotp,
         }),
       });
 
@@ -232,15 +186,13 @@ describe('Authentication API Handlers', () => {
       expect(cookieHeader).toContain('HttpOnly');
     });
 
-    it('should authenticate admin with password only when ADMIN_2FA_REQUIRED is false', async () => {
-      vi.stubEnv('ADMIN_2FA_REQUIRED', 'false');
-
+    it('should authenticate contributor directly with email and password', async () => {
       const req = new Request('http://localhost:3000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: 'admin@jivikahunt.com',
-          password: 'AdminPass123!',
+          email: 'contributor@jivikahunt.com',
+          password: 'ContributorPass1!',
         }),
       });
 
@@ -248,30 +200,8 @@ describe('Authentication API Handlers', () => {
       expect(res.status).toBe(200);
       const data = await res.json();
       expect(data.success).toBe(true);
-      expect(data.requires2FA).toBeUndefined();
-      expect(data.user.email).toBe('admin@jivikahunt.com');
-      expect(data.user.role).toBe('admin');
-    });
-
-    it('should return clear message when 2FA is required but admin has no totpSecret', async () => {
-      vi.stubEnv('ADMIN_2FA_REQUIRED', 'true');
-      adminUser.totpSecret = null;
-
-      const req = new Request('http://localhost:3000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'admin@jivikahunt.com',
-          password: 'AdminPass123!',
-        }),
-      });
-
-      const res = await loginHandler(req);
-      expect(res.status).toBe(400);
-      const data = await res.json();
-      expect(data.error).toBe(
-        '2FA is not set up. Run: node --env-file=.env scripts/enable-2fa.js admin@jivikahunt.com'
-      );
+      expect(data.user.email).toBe('contributor@jivikahunt.com');
+      expect(data.user.role).toBe('contributor');
     });
   });
 
@@ -316,6 +246,32 @@ describe('Authentication API Handlers', () => {
       expect(data.success).toBe(true);
       expect(contributorUser.tokenVersion).toBe(2);
       expect(contributorUser.mustChangePassword).toBe(false);
+    });
+
+    it('should reject passwords shorter than 8 characters', async () => {
+      const token = await createSessionToken({
+        userId: contributorUser._id.toString(),
+        email: contributorUser.email,
+        role: contributorUser.role,
+        tokenVersion: contributorUser.tokenVersion,
+      });
+
+      const req = new Request('http://localhost:3000/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: `jh_session=${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: 'ContributorPass1!',
+          newPassword: 'Short1!',
+        }),
+      });
+
+      const res = await changePasswordHandler(req);
+      expect(res.status).toBe(400);
+      const data = await res.json();
+      expect(data.error).toBe('Invalid input');
     });
   });
 });

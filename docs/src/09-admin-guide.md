@@ -17,15 +17,12 @@ node scripts/seed-admin.js admin@jivikahunt.com AdminPass123!
 The script will output:
 
 - **Email & Password**: Administrative credentials.
-- **TOTP Secret**: A 32-character Base32 secret string.
-- **Authenticator URI**: Can be imported directly into Google Authenticator, Microsoft Authenticator, or 1Password.
 
 ## 2. Accessing the Staff Portal
 
 1. Navigate to `/admin/login`.
 2. Enter your administrator email and password.
-3. Click "Sign In". The portal will prompt for your 6-digit TOTP code.
-4. Enter the code from your authenticator app to complete login.
+3. Click "Sign In" to access the dashboard.
 
 ## 3. Managing Users & Contributors
 

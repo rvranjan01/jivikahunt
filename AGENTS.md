@@ -7,7 +7,7 @@ Public visitors browse short, clean job listings, filter them, and click through
 FIXED TECH STACK
 - Next.js (latest stable, App Router), JavaScript with JSDoc types, Node LTS. No Express: use Next.js route handlers.
 - MongoDB Atlas with Mongoose. Zod for all validation. Tailwind CSS for styling.
-- bcryptjs for passwords, jose for JWT, sharp for images, otplib for admin 2FA, Resend for email.
+- bcryptjs for passwords, jose for JWT, sharp for images, Resend for email.
 - Vitest for unit and API tests, Playwright for end-to-end tests.
 - Pin exact dependency versions. Before using any library API, read its current official docs; Next.js changes quickly. Justify every new dependency in the plan. Prefer fewer dependencies.
 
@@ -27,13 +27,12 @@ ROLES AND AUTH
 - Admin creates a contributor in /admin/users. The system generates a random temporary password and emails it through Resend. On first login the user must set a new password (mustChangePassword).
 - Login uses a JWT in an httpOnly, Secure, SameSite=Lax cookie with short expiry. Store a tokenVersion on the user so password changes and deactivation invalidate old tokens. Re-check isActive from the database on every admin API call.
 - Rate-limit login per IP and per email using a MongoDB TTL collection. Lock the account temporarily after repeated failures.
-- The admin role must use TOTP 2FA (otplib).
 - Contributors publish instantly (no approval). They can create, edit and delete only their own jobs. Admin can edit, unpublish or delete anything and deactivate any user in one click.
 - Contributors have a maximum of 30 new jobs per day (configurable).
 - An AuditLog records who created, edited, deleted or unpublished what, user changes, and failed logins.
 
 DATA MODEL (Mongoose)
-User: name, displayName, email (unique), passwordHash, role, isActive, mustChangePassword, tokenVersion, totpSecret, bio (max 250 chars), photoId, createdAt.
+User: name, displayName, email (unique), passwordHash, role, isActive, mustChangePassword, tokenVersion, bio (max 250 chars), photoId, createdAt.
 Job: title, slug (unique), company { name, slug, logoId, description }, type (fresher | intern | experienced), workMode (onsite | hybrid | remote), locations [String], batches [Number], salary (optional String), skills [String], summary, responsibilities [String], eligibility [String], applyUrl, lastDate (optional), status (draft | scheduled | published | unpublished), publishAt (optional), featured (Boolean), views (Number), createdBy (userId), postedByName (copied from displayName at creation, so it survives user deletion), createdAt, updatedAt. Expiry is computed from lastDate (end of that day, IST), not stored.
 Image: contentType, data (Buffer), width, height, ownerId, createdAt.
 Report: jobId, reason (broken_link | expired | scam | other), note (optional, max 300), ipHash, status (open | resolved), createdAt.
@@ -80,7 +79,7 @@ SEO
 JobPosting JSON-LD on every job (title, description, datePosted, validThrough, hiringOrganization, jobLocation or jobLocationType TELECOMMUTE, employmentType, baseSalary only when known, directApply false). Unique title and meta description per page, canonical URLs, Open Graph tags, sitemap.xml (published and non-expired jobs, landing pages, companies, guides), robots.txt, breadcrumbs.
 
 TESTING
-Unit: slug generator, Zod schemas, URL validator, expiry logic, filter-to-query builder. API: every auth rule (contributor cannot edit another's job, deactivated user cannot log in or use an old token, forced password change, daily limit, rate limiting), filters, pagination, report endpoint, upload rejection of non-images and oversized files. End-to-end (Playwright): admin login with 2FA, create contributor, contributor posts a job, job appears in the list, filters work, detail page shows posted-by and author box, share and copy link, report link, expired job behaviour, cookie banner gating ads. Also run an accessibility check (axe) on main pages and a mobile viewport pass. CI on every push via GitHub Actions: lint, unit, API, end-to-end, audit.
+Unit: slug generator, Zod schemas, URL validator, expiry logic, filter-to-query builder. API: every auth rule (contributor cannot edit another's job, deactivated user cannot log in or use an old token, forced password change, daily limit, rate limiting), filters, pagination, report endpoint, upload rejection of non-images and oversized files. End-to-end (Playwright): admin login, create contributor, contributor posts a job, job appears in the list, filters work, detail page shows posted-by and author box, share and copy link, report link, expired job behaviour, cookie banner gating ads. Also run an accessibility check (axe) on main pages and a mobile viewport pass. CI on every push via GitHub Actions: lint, unit, API, end-to-end, audit.
 
 DOCUMENTATION
 Keep Markdown sources in docs/src and generate Word files in docs/docx with the command npm run docs:build (using the docx npm package). Write for a beginner who has never seen the project: plain English, short sentences, tables, step-by-step instructions, a glossary. Files: 01 Project overview, 02 Architecture and folder guide, 03 Data model, 04 API reference, 05 Security guide, 06 Local setup and environment variables, 07 Deployment and operations (Heroku primary, Azure or a VPS as a documented alternative, Atlas backups and restore, rollback, monitoring), 08 Testing guide with the full test-case table, 09 Admin guide, 10 Contributor guide (non-technical, how to post a job step by step), 11 SEO and ads playbook, 12 Troubleshooting and FAQ, 13 Decision log (why each choice was made), CHANGELOG. Update the affected documents in every phase, not only at the end.

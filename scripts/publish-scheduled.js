@@ -36,6 +36,9 @@ async function publishScheduledJobs() {
   let publishedCount = 0;
   for (const job of readyJobs) {
     job.status = 'published';
+    if (!job.publishedAt) {
+      job.publishedAt = now;
+    }
     job.createdAt = now; // Refresh publication timestamp
     await job.save();
 

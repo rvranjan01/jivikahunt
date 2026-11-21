@@ -21,7 +21,6 @@ jobs:
       JWT_SECRET: supersecretjwtkeythatisthirtytwocharacterslong1234
       HASH_SALT: test_salted_hash_key_1234567890
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
-      ADMIN_TOTP_SECRET: G4MXQWRJH6PAN3TN324AAOWF4EPBYS7M
 
     steps:
       - name: Checkout repository

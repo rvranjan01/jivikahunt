@@ -34,10 +34,10 @@ Security is built into every layer of JivikaHunt. We follow the principle of lea
 - Every user document contains a `tokenVersion` integer. When a user updates their password or is deactivated, their `tokenVersion` is incremented in MongoDB, instantly invalidating all existing tokens across all devices.
 - `isActive` is re-checked against MongoDB on every single administrative API call via `getSessionUser()`.
 
-### Two-Factor Authentication (2FA) (Phase 1)
+### Authentication & Password Requirements (Phase 1)
 
-- All accounts with the `admin` role are required to enroll in Time-Based One-Time Password (TOTP) 2FA using `otplib` (RFC 6238).
-- QR codes for authenticator app enrollment are generated safely using `qrcode` with `generateTotpQrCode()`.
+- Login relies on email and password authentication. Note that the admin password is the only barrier and must be long, complex, and unique.
+- All passwords must satisfy a minimum length of 8 characters, containing both letters and numbers.
 
 ### Rate Limiting & Account Lockout (Phase 1)
 

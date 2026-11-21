@@ -22,7 +22,7 @@ export async function generateMetadata({ params }) {
 
   return {
     title: content.title,
-    description: `Official ${content.title} for JivikaHunt — Verified Job Board for Freshers & Interns.`,
+    description: `Official ${content.title} for JivikaHunt — Job Board for Freshers & Interns.`,
   };
 }
 

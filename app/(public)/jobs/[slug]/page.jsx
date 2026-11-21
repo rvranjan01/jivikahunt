@@ -7,6 +7,7 @@ import AuthorBox from '@/components/AuthorBox';
 import JobCard from '@/components/JobCard';
 import ReportButton from '@/components/ReportButton';
 import SaveJobButton from '@/components/SaveJobButton';
+import SocialLinks from '@/components/SocialLinks';
 import { getPublicJobBySlug, getRelatedJobs } from '@/lib/publicJobs';
 import { formatIST } from '@/lib/time';
 import { generateJobPostingJsonLd, safeJsonLd } from '@/lib/jsonLd';
@@ -410,13 +411,15 @@ export default async function JobDetailPage({ params }) {
         </div>
       </div>
 
-      {/* Structured Data: schema.org JobPosting JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: safeJsonLd(generateJobPostingJsonLd(job)),
-        }}
-      />
+      {/* Structured Data: schema.org JobPosting JSON-LD (omitted when expired) */}
+      {!isExpired && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: safeJsonLd(generateJobPostingJsonLd(job)),
+          }}
+        />
+      )}
 
       {/* View tracker: fires one POST per session, server-side rate-limited */}
       <JobViewTracker slug={job.slug} />
@@ -442,6 +445,19 @@ export default async function JobDetailPage({ params }) {
       {/* 12. Share Buttons */}
       <div className="mt-8">
         <ShareButtons title={job.title} company={job.company?.name} url={currentUrl} />
+      </div>
+
+      {/* Get job updates box (Telegram and WhatsApp only) */}
+      <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-xs font-bold text-slate-900">Get Job Updates</h3>
+            <p className="mt-0.5 text-xs text-slate-500">
+              Join our channels for real-time freshers drives & internship notifications.
+            </p>
+          </div>
+          <SocialLinks only={['telegram', 'whatsapp']} variant="pill" />
+        </div>
       </div>
 
       {/* 13. Author Box */}

@@ -6,7 +6,7 @@
 
 ## 1. Informational Purpose Only
 
-JivikaHunt (accessible at https://jivikahunt.com) operates purely as a free informational aggregator and discovery platform for career opportunities, freshers jobs, and internships across India.
+JivikaHunt (accessible at {{siteUrl}}) operates purely as a free informational aggregator and discovery platform for career opportunities, freshers jobs, and internships across India.
 
 **We are not a recruitment agency, placement consultancy, or employer.**
 
@@ -48,4 +48,4 @@ Under no circumstances shall JivikaHunt, its founders, operators, or contributor
 
 - **Entity Name**: Ranjan Kumar Verma
 - **Last Updated**: November 2026
-- **Contact**: contact@jivikahunt.com
+- **Contact**: {{contactEmail}}

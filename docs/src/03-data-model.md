@@ -121,7 +121,6 @@ JivikaHunt stores its application data in MongoDB Atlas using Mongoose ODM. Ever
 - `isActive` (Boolean, default: true, indexed).
 - `mustChangePassword` (Boolean, default: true).
 - `tokenVersion` (Number, default: 1).
-- `totpSecret` (String, default: null).
 - `bio` (String, max 250 characters).
 
 ### LoginAttempt Schema (`models/LoginAttempt.js` — Phase 1)

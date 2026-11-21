@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import siteConfig from '@/lib/siteConfig';
+import SocialLinks from './SocialLinks';
 
 /**
  * Public four-column footer with legal disclaimers and community links.
@@ -65,47 +66,8 @@ export default function Footer() {
             <p className="mt-3 text-xs text-slate-400">
               Join our official communities for real-time alerts on freshers drives & internships:
             </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <a
-                href={siteConfig.socials.telegram}
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-colors hover:bg-blue-600 hover:text-white"
-              >
-                Telegram
-              </a>
-              <a
-                href={siteConfig.socials.whatsapp}
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-colors hover:bg-emerald-600 hover:text-white"
-              >
-                WhatsApp
-              </a>
-              <a
-                href={siteConfig.socials.linkedin}
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-colors hover:bg-blue-700 hover:text-white"
-              >
-                LinkedIn
-              </a>
-              <a
-                href={siteConfig.socials.instagram}
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-colors hover:bg-pink-600 hover:text-white"
-              >
-                Instagram
-              </a>
-              <a
-                href={siteConfig.socials.facebook}
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-colors hover:bg-blue-800 hover:text-white"
-              >
-                Facebook
-              </a>
+            <div className="mt-4">
+              <SocialLinks />
             </div>
           </div>
         </div>

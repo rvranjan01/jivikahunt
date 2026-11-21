@@ -4,6 +4,41 @@ All notable changes to the JivikaHunt project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-11-21
+
+### Added
+
+- **Google JobPosting Schema Hardening & Compliance**:
+  - Rewrote `buildSchemaDescription` in `lib/jsonLd.js` to escape dynamic values (`&`, `<`, `>`) and render strict semantic markup restricted to `<p>`, `<ul>`, and `<li>`.
+  - Added PropertyValue `identifier` with company name and internal job ID; removed legacy `sameAs`.
+  - Added granular location parsing: "City, State" splits to `addressLocality` and `addressRegion`; "Pan India" and "India" map to country-level `addressCountry: 'IN'`; remote jobs retain `TELECOMMUTE`.
+  - Added `publishedAt` field to `models/Job.js`, tracked on first publication in admin routes and scheduler scripts.
+  - Omitted schema.org `JobPosting` structured data script on expired job detail pages while retaining the alert banner and `noindex`.
+- **Job Ingestion Quality Controls & Google Policy Enforcement**:
+  - Added title validation rules: max 100 characters, rejection of all-caps titles (>3 letters), rejection of multiple exclamation marks, rejection of embedded company names, and blocking of promotional phrases ("hiring now", "apply now", "walk-in", "urgent").
+  - Enforced publication quality thresholds on non-draft jobs: summary minimum 150 characters, at least 2 responsibilities, at least 2 eligibility criteria.
+  - Added required 3-point quality verification checklist before publishing (live job verification, no payment/fees, real open job).
+  - Pre-filled job deadline to today + 30 days in Asia/Kolkata (`getDefaultLastDateIST`) and added location formatting hint.
+  - Verified job detail page hierarchy: bottom apply button only (hidden when expired) and single ad slot with no ad between content and apply.
+
+## [0.10.0] - 2026-11-21
+
+### Changed
+
+- **2FA Removal & Authentication Simplification**:
+  - Removed Time-Based One-Time Password (TOTP 2FA) completely across admin and contributor workflows.
+  - Staff and admin authentication streamlined to email and password while preserving multi-layer brute-force rate-limiting and account lockout.
+  - Enforced a minimum 8-character password policy (`MIN_PASSWORD_LENGTH = 8`) with mandatory alphanumeric validation across user creation, seeding, and password changes.
+  - Uninstalled `otplib` dependency.
+
+### Added
+
+- **Social Links & Dynamic Configuration**:
+  - Added `SocialLinks` component (`components/SocialLinks.jsx`) supporting runtime URL overrides (`NEXT_PUBLIC_INSTAGRAM_URL`, `NEXT_PUBLIC_LINKEDIN_URL`, etc.) with automatic hiding of unset channels.
+  - Integrated `SocialLinks` into footer, job detail page update box, and home page community strip.
+  - Added token replacement (`{{siteUrl}}`, `{{contactEmail}}`, `{{socialLinks}}`) in `lib/markdown.js`.
+  - Added privacy policy sections for double opt-in email alerts, web push notifications, and third-party service providers.
+
 ## [0.9.0] - 2026-11-19
 
 ### Added

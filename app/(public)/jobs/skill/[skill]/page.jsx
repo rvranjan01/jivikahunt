@@ -31,7 +31,7 @@ export async function generateMetadata({ params }) {
   }
 
   const title = `${decoded.toUpperCase()} Jobs for Freshers & Interns in India`;
-  const description = `Browse ${total} verified ${decoded} job openings and internships for college students and fresh graduates in India.`;
+  const description = `Browse ${total} ${decoded} job openings and internships for college students and fresh graduates in India.`;
 
   return {
     title,
@@ -93,7 +93,7 @@ export default async function SkillLandingPage({ params, searchParams }) {
           </h1>
 
           <p className="mt-2 text-xs leading-relaxed text-slate-600 sm:text-sm">
-            Discover verified entry-level job drives and internships requiring{' '}
+            Discover entry-level job drives and internships requiring{' '}
             <strong className="font-semibold text-slate-800 capitalize">{decoded}</strong>. Direct
             links to official company career portals with zero recruitment spam.
           </p>

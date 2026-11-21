@@ -1,13 +1,13 @@
 /**
  * @file scripts/seed-admin.js
- * @description Seeds the initial administrator account and generates their TOTP 2FA configuration.
+ * @description Seeds the initial administrator account.
  * Usage: node scripts/seed-admin.js [adminEmail] [adminPassword]
  */
 
 import { connectToDatabase } from '../lib/db.js';
 import User from '../models/User.js';
 import { hashPassword } from '../lib/password.js';
-import { createTotpSecret, generateTotpQrCode } from '../lib/totp.js';
+import { MIN_PASSWORD_LENGTH } from '../lib/validation.js';
 
 if (process.argv.includes('--dry-run')) {
   console.info('Dry run: scripts/seed-admin.js loaded successfully. Skipping DB operations.');
@@ -24,6 +24,11 @@ if (!email || !password) {
   process.exit(1);
 }
 
+if (password.length < MIN_PASSWORD_LENGTH) {
+  console.error(`Error: Password must be at least ${MIN_PASSWORD_LENGTH} characters long.`);
+  process.exit(1);
+}
+
 async function seedAdmin() {
   console.info('Connecting to database...');
   await connectToDatabase();
@@ -32,16 +37,6 @@ async function seedAdmin() {
   if (existing) {
     console.info(`Admin user with email ${email} already exists.`);
     process.exit(0);
-  }
-
-  const is2FaRequired = process.env.ADMIN_2FA_REQUIRED !== 'false';
-  let totpSecret = null;
-  let uri = null;
-
-  if (is2FaRequired) {
-    totpSecret = createTotpSecret();
-    const qrResult = await generateTotpQrCode(email, totpSecret);
-    uri = qrResult.uri;
   }
 
   const passwordHash = await hashPassword(password);
@@ -55,7 +50,6 @@ async function seedAdmin() {
     isActive: true,
     mustChangePassword: true,
     tokenVersion: 1,
-    totpSecret,
     bio: 'Founder and administrator at JivikaHunt.',
   });
 
@@ -63,17 +57,7 @@ async function seedAdmin() {
   console.info('🎉 [ADMIN ACCOUNT SEEDED SUCCESSFULLY]');
   console.info(`ID:           ${admin._id}`);
   console.info(`Email:        ${email}`);
-  if (is2FaRequired) {
-    console.info(`TOTP Secret:  ${totpSecret}`);
-    console.info(`Authenticator URI: ${uri}`);
-    console.info('='.repeat(60));
-    console.info(
-      'Scan the TOTP URI with your authenticator app (Google Authenticator, Microsoft Authenticator, 1Password).\n'
-    );
-  } else {
-    console.info('2FA:          Disabled (ADMIN_2FA_REQUIRED=false)');
-    console.info('='.repeat(60));
-  }
+  console.info('='.repeat(60));
 
   process.exit(0);
 }

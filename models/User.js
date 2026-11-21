@@ -51,10 +51,6 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: 1,
     },
-    totpSecret: {
-      type: String,
-      default: null,
-    },
     bio: {
       type: String,
       maxlength: [250, 'Bio cannot exceed 250 characters'],

@@ -125,6 +125,11 @@ const JobSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    publishedAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
     featured: {
       type: Boolean,
       default: false,

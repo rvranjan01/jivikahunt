@@ -5,6 +5,7 @@ import JobFilters from '@/components/JobFilters';
 import Pagination from '@/components/Pagination';
 import AdSlot from '@/components/AdSlot';
 import JobAlertsBanner from '@/components/JobAlertsBanner';
+import SocialLinks from '@/components/SocialLinks';
 import siteConfig from '@/lib/siteConfig';
 
 export const revalidate = 120;
@@ -40,7 +41,7 @@ export default async function HomePage({ searchParams }) {
         <div className="max-w-2xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-100/60 px-3 py-1 text-xs font-bold text-blue-800">
             <span className="h-2 w-2 animate-pulse rounded-full bg-blue-600" />
-            Verified Opportunities • Zero Application Fees
+            Curated Opportunities • Zero Application Fees
           </div>
 
           <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
@@ -49,7 +50,7 @@ export default async function HomePage({ searchParams }) {
 
           <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
             Apply directly to official careers portals at top tech firms, startups, and enterprises.
-            No spam, no third-party recruiters, and no expired listings.
+            No application fees, no third-party recruiters, and no expired listings.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-2">
@@ -72,6 +73,8 @@ export default async function HomePage({ searchParams }) {
               Remote Roles
             </Link>
           </div>
+
+          <SocialLinks variant="strip" className="mt-6 border-t border-blue-100/80 pt-4" />
         </div>
       </section>
 

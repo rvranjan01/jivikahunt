@@ -1,11 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { generateSync } from 'otplib';
 import { TEST_ADMIN, TEST_CONTRIBUTOR } from './fixtures/seed.js';
 
 test.describe('Admin & Contributor End-to-End Workflows', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test('admin login requires credentials and valid TOTP 2FA code', async ({ page }) => {
+  test('admin login requires credentials and logs in directly', async ({ page }) => {
     await page.goto('/admin/login');
 
     // 1. Verify invalid credentials rejection (use unseeded email so admin is not locked out)
@@ -15,23 +14,9 @@ test.describe('Admin & Contributor End-to-End Workflows', () => {
 
     await expect(page.locator('text=Invalid email or password.')).toBeVisible();
 
-    // 2. Supply valid password -> triggers 2FA prompt
+    // 2. Supply valid password -> logs in directly to admin dashboard
     await page.fill('#email', TEST_ADMIN.email);
     await page.fill('#password', TEST_ADMIN.password);
-    await page.click('button[type="submit"]');
-
-    // 2FA container becomes visible
-    await expect(page.locator('#totpCode')).toBeVisible();
-    await expect(page.locator('text=Two-Factor Authentication')).toBeVisible();
-
-    // 3. Submit invalid 2FA code
-    await page.fill('#totpCode', '000000');
-    await page.click('button[type="submit"]');
-    await expect(page.locator('text=Invalid 2FA code')).toBeVisible();
-
-    // 4. Submit genuine TOTP code generated using otplib
-    const validCode = generateSync({ secret: TEST_ADMIN.totpSecret });
-    await page.fill('#totpCode', validCode);
     await page.click('button[type="submit"]');
 
     // Verify successful redirection to admin dashboard
@@ -44,11 +29,6 @@ test.describe('Admin & Contributor End-to-End Workflows', () => {
     await page.goto('/admin/login');
     await page.fill('#email', TEST_ADMIN.email);
     await page.fill('#password', TEST_ADMIN.password);
-    await page.click('button[type="submit"]');
-
-    await expect(page.locator('#totpCode')).toBeVisible();
-    const validCode = generateSync({ secret: TEST_ADMIN.totpSecret });
-    await page.fill('#totpCode', validCode);
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL(/\/admin$/);
 
@@ -79,7 +59,6 @@ test.describe('Admin & Contributor End-to-End Workflows', () => {
   });
 
   test('contributor logs in, sees ChatGPT helper, and publishes a new job', async ({ page }) => {
-    // Contributor login does not require 2FA
     await page.goto('/admin/login');
     await page.fill('#email', TEST_CONTRIBUTOR.email);
     await page.fill('#password', TEST_CONTRIBUTOR.password);

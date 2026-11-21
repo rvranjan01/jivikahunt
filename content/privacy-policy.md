@@ -1,9 +1,9 @@
 # Privacy Policy
 
 **Effective Date:** 12 November 2026
-**Last Updated:** 12 November 2026
+**Last Updated:** November 2026
 
-At **JivikaHunt** (accessible from https://jivikahunt.com), the privacy of our visitors is of paramount importance. This Privacy Policy outlines the types of information we collect, how we use it, and how your data is protected.
+At **JivikaHunt** (accessible from {{siteUrl}}), the privacy of our visitors is of paramount importance. This Privacy Policy outlines the types of information we collect, how we use it, and how your data is protected.
 
 ---
 
@@ -20,7 +20,7 @@ We may collect minimal non-personally identifiable information to keep the site 
 
 1. **Log Files & Network Data**: Standard server logs containing Internet Protocol (IP) addresses, browser type, referring pages, timestamps, and page request counts. IP addresses are hashed using a cryptographic salt before rate limiting or audit recording.
 2. **Local Storage**: We may use browser `localStorage` locally on your device to save bookmarked job listings without requiring a server login. This information stays entirely within your browser.
-3. **Contact Inquiries**: If you email us at `contact@jivikahunt.com`, we receive your email address and message solely to respond to your inquiry.
+3. **Contact Inquiries**: If you email us at `{{contactEmail}}`, we receive your email address and message solely to respond to your inquiry.
 
 ---
 
@@ -38,7 +38,26 @@ You can manage or disable cookies through your browser settings. Please note tha
 
 ---
 
-## 4. Google AdSense & Third-Party Advertising
+## 4. Email Job Alerts & Web Push Notifications
+
+- **Email Job Alerts**: When you subscribe to job alerts, we collect your email address and alert preferences (such as job type and graduation batch). We enforce a double opt-in mechanism requiring email verification before alerts are activated. Your email address and preferences are stored securely until you unsubscribe. Every alert email contains a direct one-click unsubscribe link. Alert data is retained for [TO FILL].
+- **Web Push Notifications**: Web push notifications are delivered only after your explicit consent via the browser prompt and consent banner. Push tokens are stored without personally identifying information and can be revoked at any time in your browser settings. Push tokens are retained for [TO FILL].
+
+---
+
+## 5. Third-Party Infrastructure & Service Providers
+
+We rely on trusted third-party service providers to host, operate, and maintain JivikaHunt:
+
+- **Hosting & Compute**: Heroku (processes web traffic and hosts application route handlers; server logs retained for [TO FILL]).
+- **Database Storage**: MongoDB Atlas (stores job posts, administrative accounts, rate limits, and alert subscriptions; backups and records retained for [TO FILL]).
+- **Email Delivery Provider**: Resend (delivers verification emails, contributor invitations, and job digests; delivery logs retained for [TO FILL]).
+- **Advertising**: Google AdSense (serves display advertisements, active only after user consent).
+- **Web Push Provider**: OneSignal (dispatches push notifications to opted-in devices).
+
+---
+
+## 6. Google AdSense & Third-Party Advertising
 
 JivikaHunt displays advertisements provided by Google AdSense and third-party advertising partners to support the free operation of this platform.
 
@@ -48,22 +67,21 @@ JivikaHunt displays advertisements provided by Google AdSense and third-party ad
 
 ---
 
-## 5. External Career Portal Links
+## 7. External Career Portal Links
 
 Our website contains outbound links to external company career pages and applicant tracking systems. JivikaHunt has no control over and assumes no responsibility for the content, privacy policies, or practices of any third-party websites or services.
 
 ---
 
-## 6. Children's Privacy
+## 8. Children's Privacy
 
 JivikaHunt does not knowingly collect personally identifiable information from children under the age of 13. If you believe your child has provided personal information on our website, please contact us immediately, and we will promptly remove such records.
 
 ---
 
-## 7. Legal Contact & Controller Details
+## 9. Legal Contact & Controller Details
 
 For questions or concerns regarding this Privacy Policy:
 
 - **Data Controller**: Ranjan Kumar Verma
-- **Postal Address**: BTM 2nd Stage Near Geeky Ants, bangalore, Karnataka,India
-- **Data Protection Officer / Inquiries**: contact@jivikahunt.com
+- **Data Protection Officer / Inquiries**: {{contactEmail}}

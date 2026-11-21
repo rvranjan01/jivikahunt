@@ -178,6 +178,7 @@ export async function POST(request) {
       lastDate: jobData.lastDate ? new Date(jobData.lastDate) : null,
       status: jobData.status,
       publishAt: jobData.publishAt ? new Date(jobData.publishAt) : null,
+      publishedAt: jobData.status === 'published' ? new Date() : null,
       featured: user.role === 'admin' ? Boolean(jobData.featured) : false,
       createdBy: user._id,
       postedByName: user.displayName, // Preserved so attribution survives contributor deletion

@@ -152,7 +152,7 @@ All JivikaHunt backend endpoints are implemented as Next.js App Router Route Han
 
 ### POST /api/auth/login
 
-- **Description**: Authenticates user credentials with rate-limiting and mandatory admin TOTP 2FA. Sets httpOnly `jh_session` cookie.
+- **Description**: Authenticates user credentials with rate-limiting. Sets httpOnly `jh_session` cookie.
 
 ### POST /api/auth/logout
 
